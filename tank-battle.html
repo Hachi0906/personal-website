@@ -1351,47 +1351,232 @@
     background: rgba(160,72,72,0.08);
   }
 
-  /* ======= ACHIEVEMENTS (战绩勋章列表) ======= */
+  /* ======= ACHIEVEMENTS (战绩勋章列表) · 鲜 艳 军 事 风 · 纯 文 字 ======= */
+  /* 面板外壳：鲜艳军营风背景（深橄榄黑底 + 细金网格 + 顶部八一红光晕） */
+  #achievementsPanel {
+    background:
+      radial-gradient(ellipse 70% 40% at 50% 0%, rgba(224,64,64,0.18) 0%, rgba(0,0,0,0) 65%),
+      linear-gradient(rgba(168,148,102,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168,148,102,0.045) 1px, transparent 1px),
+      linear-gradient(180deg, #22261e 0%, #141812 100%) !important;
+    background-size: 100% 100%, 7px 7px, 7px 7px, 100% 100% !important;
+    border-color: rgba(168,148,102,0.55) !important;
+    box-shadow:
+      0 0 0 1px rgba(255,248,220,0.12),
+      0 24px 56px rgba(0,0,0,0.8),
+      inset 0 0 48px rgba(168,148,102,0.12),
+      inset 0 0 0 1px rgba(0,0,0,0.5) !important;
+  }
+  #achievementsPanel h2 {
+    background: linear-gradient(180deg, #fff8d8 0%, #ffd870 55%, #c89a3a 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-shadow: 0 0 18px rgba(255,200,100,0.55) !important;
+  }
+
   .achievements-list {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
     max-height: 520px; overflow-y: auto; padding-right: 8px;
   }
   .achievements-list::-webkit-scrollbar { width: 10px; }
-  .achievements-list::-webkit-scrollbar-track { background: rgba(107,142,90,0.08); border-radius: 6px; }
-  .achievements-list::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#a89466,#6b8e5a); border-radius: 6px; }
-  .ach-card {
-    display: flex; gap: 14px; padding: 14px;
-    background: rgba(40,44,40,0.65);
-    border: 1px solid rgba(107,142,90,0.32); border-radius: 4px;
+  .achievements-list::-webkit-scrollbar-track { background: rgba(107,142,90,0.14); border-radius: 6px; }
+  .achievements-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #e0be6a, #7fb258);
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(127,178,88,0.45);
+  }
+
+  /* —— 单张成就卡片：纯文字 · 鲜艳军事表单风 —— */
+  .achievement-card {
     position: relative;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    padding: 12px 14px 11px;
+    background:
+      linear-gradient(rgba(107,142,90,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(107,142,90,0.035) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(52,62,46,0.78) 0%, rgba(28,36,24,0.92) 100%);
+    background-size: 5px 5px, 5px 5px, 100% 100%;
+    border: 1px solid rgba(127,178,88,0.48);
+    border-radius: 4px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 3px 10px rgba(0,0,0,0.35),
+      0 0 10px rgba(127,178,88,0.10);
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
-  .ach-card.unlocked {
-    border-color: rgba(168,148,102,0.65);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.5), inset 0 0 20px rgba(168,148,102,0.1), 0 0 14px rgba(168,148,102,0.12);
+  /* L 型金角：更粗、更亮、微发光 */
+  .achievement-card::before, .achievement-card::after {
+    content: ''; position: absolute;
+    width: 13px; height: 13px;
+    border: 1.8px solid #e0be6a;
+    opacity: 0.92; pointer-events: none;
+    filter: drop-shadow(0 0 2px rgba(255,220,140,0.55));
   }
-  .ach-card::before, .ach-card::after {
-    content: ''; position: absolute; width: 12px; height: 12px; border: 1.5px solid var(--gold); opacity: 0.55;
+  .achievement-card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .achievement-card::after  { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* ========== 已 解 锁 态（鲜·金·辉·绿） ========== */
+  .achievement-card.unlocked {
+    border-color: rgba(255,215,106,0.78);
+    background:
+      linear-gradient(rgba(255,220,140,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,220,140,0.045) 1px, transparent 1px),
+      radial-gradient(ellipse 90% 80% at 50% 0%, rgba(255,120,90,0.22) 0%, rgba(0,0,0,0) 50%),
+      linear-gradient(180deg, rgba(72,56,24,0.82) 0%, rgba(44,32,14,0.96) 100%);
+    background-size: 6px 6px, 6px 6px, 100% 100%, 100% 100%;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.6),
+      inset 0 0 22px rgba(255,200,100,0.18),
+      0 0 18px rgba(255,200,100,0.30),
+      0 4px 12px rgba(0,0,0,0.5);
   }
-  .ach-card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-  .ach-card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-  .ach-icon {
-    width: 54px; height: 54px; flex: 0 0 54px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(145deg, rgba(168,148,102,0.15), rgba(23,26,23,0.95));
-    border: 1px solid rgba(168,148,102,0.45);
-    box-shadow: inset 0 0 14px rgba(168,148,102,0.25);
+  .achievement-card.unlocked::before, .achievement-card.unlocked::after {
+    border-color: #ffe28a;
+    filter: drop-shadow(0 0 4px rgba(255,230,140,0.85));
   }
-  .ach-card.unlocked .ach-icon {
-    background: radial-gradient(circle at 35% 30%, #fff3c7, #c4a86a 45%, #6b5a3a 100%);
-    box-shadow: 0 0 22px rgba(255,220,140,0.45), inset 0 0 10px rgba(0,0,0,0.25);
-    border-color: #f0d088;
+  .achievement-card.unlocked:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255,240,170,0.92);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.6),
+      inset 0 0 28px rgba(255,220,140,0.22),
+      0 0 34px rgba(255,220,140,0.46),
+      0 0 20px rgba(224,64,64,0.22),
+      0 8px 20px rgba(0,0,0,0.55);
   }
-  .ach-card .ach-name { color: var(--textHigh); font-size: 14px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
-  .ach-card.unlocked .ach-name { color: #fff4d0; }
-  .ach-card .ach-desc { color: var(--textMid); font-size: 12px; line-height: 1.65; }
-  .ach-card .ach-progress { margin-top: 6px; font-size: 11px; color: var(--textLow); letter-spacing: 1px; }
-  .ach-card.unlocked .ach-progress { color: var(--gold); }
+
+  /* ========== 未 达 成 态（鲜·绿·灰，不要死灰） ========== */
+  .achievement-card.locked {
+    opacity: 1;
+    border-color: rgba(127,178,88,0.42);
+    background:
+      linear-gradient(rgba(127,178,88,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(127,178,88,0.05) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(38,52,36,0.85) 0%, rgba(20,30,20,0.96) 100%);
+    background-size: 5px 5px, 5px 5px, 100% 100%;
+  }
+  .achievement-card.locked::before, .achievement-card.locked::after {
+    border-color: #86a864;
+    opacity: 0.82;
+    filter: drop-shadow(0 0 2px rgba(134,168,100,0.45));
+  }
+
+  /* —— 顶部行（编号 + 名称 + 状态）—— */
+  .ach-head {
+    display: flex; align-items: center;
+    gap: 10px;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed rgba(168,148,102,0.38);
+  }
+  .achievement-card.locked .ach-head {
+    border-bottom-color: rgba(127,178,88,0.32);
+  }
+  .ach-no {
+    font-family: Consolas, "Courier New", monospace;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #f0d484;
+    padding: 2px 7px;
+    border: 1.3px solid rgba(224,190,106,0.65);
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgba(255,220,140,0.20) 0%, rgba(168,148,102,0.10) 100%);
+    box-shadow: inset 0 0 8px rgba(255,220,140,0.18), 0 0 6px rgba(224,190,106,0.22);
+    text-shadow: 0 0 6px rgba(255,220,140,0.65);
+    flex: 0 0 auto;
+  }
+  .achievement-card.locked .ach-no {
+    color: #b8d090;
+    border-color: rgba(127,178,88,0.55);
+    background: linear-gradient(180deg, rgba(127,178,88,0.18) 0%, rgba(107,142,90,0.08) 100%);
+    box-shadow: inset 0 0 8px rgba(127,178,88,0.16);
+    text-shadow: 0 0 4px rgba(127,178,88,0.5);
+  }
+  .ach-name {
+    flex: 1;
+    font-family: SimHei, "Microsoft YaHei", sans-serif;
+    font-size: 15px; font-weight: 900;
+    letter-spacing: 2px;
+    color: #fff7d8;
+    text-shadow: 0 1px 6px rgba(255,200,100,0.45), 0 0 12px rgba(0,0,0,0.75);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .achievement-card.locked .ach-name {
+    color: #d8dfc8;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.85);
+  }
+  .ach-status {
+    flex: 0 0 auto;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 3px 9px;
+    border-radius: 2px;
+    font-weight: 800;
+  }
+  /* 已解锁：鲜绿军徽色 + 发光 */
+  .achievement-card.unlocked .ach-status {
+    color: #d8f0b0;
+    background: linear-gradient(180deg, rgba(127,178,88,0.26) 0%, rgba(107,142,90,0.14) 100%);
+    border: 1.3px solid rgba(143,200,88,0.72);
+    box-shadow: 0 0 8px rgba(143,200,88,0.38), inset 0 0 8px rgba(143,200,88,0.18);
+    text-shadow: 0 0 6px rgba(200,240,140,0.75);
+  }
+  /* 未达成：鲜亮八一红，不要死灰 */
+  .achievement-card.locked .ach-status {
+    color: #ffb0a8;
+    background: linear-gradient(180deg, rgba(224,64,64,0.22) 0%, rgba(160,72,72,0.10) 100%);
+    border: 1.3px solid rgba(224,80,80,0.62);
+    box-shadow: 0 0 7px rgba(224,64,64,0.30), inset 0 0 6px rgba(224,64,64,0.14);
+    text-shadow: 0 0 4px rgba(255,170,160,0.6);
+  }
+
+  /* —— 成就描述文本 —— */
+  .ach-desc {
+    font-size: 12.5px;
+    line-height: 1.72;
+    letter-spacing: 0.4px;
+    color: #e8e4ce;
+    min-height: 41px;
+    text-align: justify;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+  }
+  .achievement-card.locked .ach-desc {
+    color: #b8c0a8;
+  }
+
+  /* —— 底部行（进度 / 解锁时间）—— */
+  .ach-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 7px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,200,100,0.22);
+  }
+  .achievement-card.locked .ach-foot {
+    border-top-color: rgba(127,178,88,0.28);
+  }
+  .ach-progress {
+    font-size: 11.5px; letter-spacing: 1px;
+    font-family: Consolas, "Courier New", monospace;
+    font-weight: 700;
+    color: #8cc862;
+    text-shadow: 0 0 4px rgba(140,200,98,0.35);
+  }
+  .achievement-card.unlocked .ach-progress {
+    color: #ffd870;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-shadow: 0 0 8px rgba(255,216,112,0.7);
+  }
+  .achievement-card.locked .ach-progress {
+    color: #9cc872;
+  }
+  .ach-time {
+    font-size: 10.5px; letter-spacing: 0.3px;
+    color: #c8b890;
+    font-family: Consolas, "Courier New", monospace;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+  }
 
   /* Toast (成就解锁) - 左下角玻璃质感弹窗 */
   #achievementToastHost {
@@ -1979,12 +2164,8 @@
           <circle cx="32" cy="13.5" r="2.3" fill="#ffd76b" stroke="#7a5410" stroke-width="0.8"/>
           <circle cx="32" cy="52"   r="2.3" fill="#ffd76b" stroke="#7a5410" stroke-width="0.8"/>
         </svg>
+      <!-- 原 3 个测试按钮（测试晋升/结局一胜利/结局二失败）已移除，保留奖杯成就入口 -->
       </button>
-      <div class="corner-buttons-top">
-        <button class="corner-btn mini" id="btnTestPromotion">🧪 测试晋升</button>
-        <button class="corner-btn mini gold" id="btnTestEndVictory">结局一·胜利</button>
-        <button class="corner-btn mini danger" id="btnTestEndDefeat">结局二·失败</button>
-      </div>
       <div class="menu-title">边境保卫战</div>
       <div class="menu-subtitle">BORDER DEFENSE · ARMORED WARFARE</div>
     </div>
@@ -3141,22 +3322,23 @@ function renderAchievements() {
   const list = document.getElementById('achievementsList');
   if (!list) return;
   list.innerHTML = '';
-  ACHIEVEMENTS.forEach(a => {
+  ACHIEVEMENTS.forEach((a, idx) => {
     const s = progress.achievements[a.id] || { unlocked:false, unlockedAt:0 };
     let progText = '- / -';
     try { progText = a.progress({ kills: game.enemiesDestroyed, shotsFired: game.shotsFired, damageDealt: game.damageDealt, medkitsUsed: game.medkitsUsed||0, victory:false, baseHp:0, baseMaxHp:1, score:0 }); } catch(e) {}
     const el = document.createElement('div');
     el.className = 'achievement-card' + (s.unlocked ? ' unlocked' : ' locked');
-    const svgIcon = ACHIEVEMENT_SVGS[a.icon] || `<span style="font-size:30px">🎖️</span>`;
+    const no = String(idx + 1).padStart(2, '0');
     el.innerHTML = `
-      <div class="ach-icon">${svgIcon}</div>
-      <div class="ach-body">
-        <div class="ach-name">${a.name}</div>
-        <div class="ach-desc">${a.desc}</div>
-        <div class="ach-meta">
-          <span class="ach-progress">${s.unlocked ? '已 解 锁' : progText}</span>
-          ${s.unlocked ? `<span class="ach-time">${new Date(s.unlockedAt).toLocaleString('zh-CN')}</span>` : ''}
-        </div>
+      <div class="ach-head">
+        <span class="ach-no">${no}</span>
+        <span class="ach-name">${a.name}</span>
+        <span class="ach-status">${s.unlocked ? '已 解 锁' : '未 达 成'}</span>
+      </div>
+      <div class="ach-desc">${a.desc}</div>
+      <div class="ach-foot">
+        <span class="ach-progress">${s.unlocked ? '—— 完 成 ——' : progText}</span>
+        ${s.unlocked ? `<span class="ach-time">${new Date(s.unlockedAt).toLocaleString('zh-CN')}</span>` : ''}
       </div>`;
     list.appendChild(el);
   });
@@ -4164,49 +4346,8 @@ function showMainMenu() {
     });
   };
   try {
+    // —— 成就中心奖杯按钮保留（主菜单左上角入口）——
     _bindOnce('btnAchievementsCenter', openAchievements);
-    _bindOnce('btnTestPromotion', () => {
-      // 【测试晋升】直接强制升一级（不到顶就弹晋升动画），便于查看所有军衔徽章和特效
-      const cur = getPlayerRankLevel();
-      if (cur >= RANKS.length - 1) {
-        alert('测试晋升 · 已达最高军衔「' + RANKS[RANKS.length - 1].name + '」。\n如想重置军衔，请在主菜单点"重置进度"按钮。');
-        return;
-      }
-      const newRankIdx = cur + 1;
-      // 同步 exp 到对应军衔门槛（保证下次getPlayerRankLevel结果一致）
-      let expAcc = 0;
-      for (let i = 0; i <= newRankIdx; i++) expAcc += RANKS[i].expNeeded || 0;
-      progress.exp = Math.max(progress.exp, expAcc);
-      // 同步 completed 数组长度（至少 >= unlockAfter，保证双路径一致）
-      const needCompleted = RANKS[newRankIdx].unlockAfter;
-      if (Array.isArray(progress.completed) && progress.completed.length < needCompleted) {
-        while (progress.completed.length < needCompleted) progress.completed.push('__test__' + progress.completed.length);
-      } else if (!Array.isArray(progress.completed)) {
-        progress.completed = [];
-        while (progress.completed.length < needCompleted) progress.completed.push('__test__' + progress.completed.length);
-      }
-      saveProgress();
-      updateMenuRankDisplay();
-      hideAllOverlays();
-      showPromotion(newRankIdx);
-    });
-    _bindOnce('btnTestEndVictory', () => {
-      // 仅用于开发：绕过 endings.victory 标志直接播放结局CG
-      startEndingVictoryCG(() => {
-        progress.endings.victory = true;
-        progress.endings.victorySeen = (progress.endings.victorySeen || 0) + 1;
-        saveProgress();
-        openDecorations();
-      });
-    });
-    _bindOnce('btnTestEndDefeat', () => {
-      startEndingDefeatCG(() => {
-        progress.endings.defeat = true;
-        progress.endings.defeatSeen = (progress.endings.defeatSeen || 0) + 1;
-        saveProgress();
-        showMainMenu();
-      });
-    });
   } catch(err) {
     console.error('[showMainMenu bindOnce failed]', err);
     alert('主菜单按钮绑定失败：'+err.message);
@@ -7371,43 +7512,7 @@ function bindUI() {
       }
     });
   };
-  // ① 测试晋升【直接强制升一级 + 双路径同步exp/completed，保证每次点击必弹晋升动画】
-  _safeBind('btnTestPromotion', '测试晋升', function() {
-    const cur = getPlayerRankLevel();
-    if (cur >= RANKS.length - 1) {
-      alert('测试晋升 · 已达最高军衔「' + RANKS[RANKS.length - 1].name + '」。\n如想重置军衔，请在主菜单点"重置进度"按钮。');
-      return;
-    }
-    const newRankIdx = cur + 1;
-    let expAcc = 0;
-    for (let i = 0; i <= newRankIdx; i++) expAcc += RANKS[i].expNeeded || 0;
-    progress.exp = Math.max(typeof progress.exp === 'number' ? progress.exp : 0, expAcc);
-    const needCompleted = RANKS[newRankIdx].unlockAfter;
-    if (!Array.isArray(progress.completed)) progress.completed = [];
-    while (progress.completed.length < needCompleted) progress.completed.push('__test__' + progress.completed.length);
-    saveProgress();
-    try { updateMenuRankDisplay(); } catch(e){}
-    hideAllOverlays();
-    showPromotion(newRankIdx);
-  });
-  // ② 结局一·胜利（开发测试）
-  _safeBind('btnTestEndVictory', '结局一·胜利', function() {
-    startEndingVictoryCG(function onDone() {
-      progress.endings.victory = true;
-      progress.endings.victorySeen = (progress.endings.victorySeen || 0) + 1;
-      saveProgress();
-      openDecorations();
-    });
-  });
-  // ③ 结局二·失败（开发测试）
-  _safeBind('btnTestEndDefeat', '结局二·失败', function() {
-    startEndingDefeatCG(function onDone() {
-      progress.endings.defeat = true;
-      progress.endings.defeatSeen = (progress.endings.defeatSeen || 0) + 1;
-      saveProgress();
-      showMainMenu();
-    });
-  });
+  // —— 三个开发测试按钮（btnTestPromotion/btnTestEndVictory/btnTestEndDefeat）已移除 ——
 
   // --- Decorations / 授勋中心 ---
   const dClose = document.getElementById('btnDecorationsClose');
