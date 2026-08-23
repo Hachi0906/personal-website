@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>雾湖冰精传 ～ Baka Bullet Legend</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a1a2e;
+    font-family: "Microsoft YaHei", "Noto Sans JP", serif;
+    color: #e0f0ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  #gameWrapper {
+    position: relative;
+    width: 480px; height: 640px;
+    border: 2px solid #66ccff;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(102, 204, 255, 0.5), inset 0 0 30px rgba(102, 204, 255, 0.08);
+    overflow: hidden;
+  }
+  canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+  .menuScreen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: rgba(10, 26, 46, 0.95); z-index: 10; overflow-y: auto;
+  }
+  .hidden { display: none !important; }
+  h1.gameTitle {
+    font-size: 32px; color: #88ddff;
+    text-shadow: 0 0 10px #44aadd, 0 0 20px #44aadd, 0 0 40px #2288bb;
+    margin-bottom: 8px; letter-spacing: 4px;
+  }
+  h2.gameSubtitle { font-size: 14px; color: #88ccdd; margin-bottom: 30px; letter-spacing: 2px; }
+  .menuBtn {
+    width: 200px; padding: 12px 24px; margin: 6px;
+    background: transparent; border: 1px solid #66bbff; color: #aaddff;
+    font-size: 16px; cursor: pointer; transition: all 0.2s; border-radius: 4px; font-family: inherit;
+  }
+  .menuBtn:hover { background: #3399cc; color: #fff; box-shadow: 0 0 15px rgba(102, 187, 255, 0.7); }
+  .menuBtn:active { transform: scale(0.95); }
+  .menuBtn.small { width: 140px; padding: 8px 16px; font-size: 13px; }
+  .charSelect { display: flex; gap: 16px; margin: 16px 0; }
+  .charCard {
+    width: 150px; padding: 12px; border: 2px solid #335; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+    background: rgba(255,255,255,0.02);
+  }
+  .charCard:hover { border-color: #66bbff; }
+  .charCard.selected { border-color: #88ddff; box-shadow: 0 0 15px rgba(136, 221, 255, 0.5); background: rgba(136, 221, 255, 0.08); }
+  .charAvatar { width: 80px; height: 80px; margin: 0 auto 8px; border-radius: 50%; overflow: hidden; }
+  .charName { font-size: 15px; color: #e0f0ff; margin-bottom: 2px; }
+  .charTitle { font-size: 11px; color: #88aacc; margin-bottom: 6px; }
+  .charDesc { font-size: 10px; color: #8899aa; line-height: 1.5; }
+  .sectionTitle { font-size: 18px; color: #88ddff; margin-bottom: 12px; text-shadow: 0 0 8px rgba(136, 221, 255, 0.5); }
+  .hintText { font-size: 12px; color: #88aacc; margin-top: 16px; text-align: center; line-height: 1.8; }
+  .resultBox { text-align: center; padding: 16px; }
+  .resultScore { font-size: 36px; color: #88ddff; text-shadow: 0 0 10px rgba(136, 221, 255, 0.5); margin: 16px 0; }
+  .resultLabel { color: #88aacc; font-size: 14px; margin-bottom: 4px; }
+  .difficultyRow, .stageGrid { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; justify-content: center; }
+  .diffBtn, .stageBtn {
+    padding: 8px 14px; border: 1px solid #446; border-radius: 4px;
+    cursor: pointer; font-size: 13px; transition: all 0.2s;
+    background: transparent; color: #88aacc; font-family: inherit;
+  }
+  .stageBtn { width: 100px; }
+  .diffBtn:hover, .stageBtn:hover { border-color: #66bbff; color: #aaddff; }
+  .diffBtn.selected, .stageBtn.selected { border-color: #88ddff; color: #88ddff; background: rgba(136, 221, 255, 0.1); }
+  .infoRow { display: flex; justify-content: space-between; width: 100%; max-width: 360px; color: #88aacc; font-size: 12px; margin: 4px 0; }
+  .infoRow span { color: #aaddff; }
+</style>
+</head>
+<body>
+<div id="gameWrapper">
+  <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+  <!-- 标题画面 -->
+  <div id="titleScreen" class="menuScreen">
+    <h1 class="gameTitle">雾湖冰精传</h1>
+    <h2 class="gameSubtitle">～ Baka Bullet Legend ～</h2>
+    <button class="menuBtn" onclick="showStageSelect()">开始游戏</button>
+    <button class="menuBtn" onclick="showCharSelect()">角色选择</button>
+    <button class="menuBtn" onclick="showHelp()">操作说明</button>
+    <div id="titleInfo" class="hintText"></div>
+  </div>
+
+  <!-- 角色选择 -->
+  <div id="charScreen" class="menuScreen hidden">
+    <div class="sectionTitle">选择自机</div>
+    <div class="charSelect">
+      <div class="charCard selected" data-char="marisa" onclick="selectChar('marisa')">
+        <canvas class="charAvatar" id="avatarMarisa" width="80" height="80"></canvas>
+        <div class="charName">雾雨魔理沙</div>
+        <div class="charTitle">普通的魔法使</div>
+        <div class="charDesc">高火力输出<br>激光对Boss极强<br>集中射击移动慢</div>
+      </div>
+      <div class="charCard" data-char="reimu" onclick="selectChar('reimu')">
+        <canvas class="charAvatar" id="avatarReimu" width="80" height="80"></canvas>
+        <div class="charName">博丽灵梦</div>
+        <div class="charTitle">乐园的巫女</div>
+        <div class="charDesc">均衡全能型<br>追踪符自动索敌<br>梦想封印全屏消弹</div>
+      </div>
+    </div>
+    <button class="menuBtn" onclick="showTitle()">返回</button>
+  </div>
+
+  <!-- 关卡选择 -->
+  <div id="stageScreen" class="menuScreen hidden">
+    <div class="sectionTitle">选择关卡</div>
+    <div class="stageGrid" id="stageBtns"></div>
+    <div class="sectionTitle" style="font-size:14px;margin-top:8px;">难度选择</div>
+    <div class="difficultyRow">
+      <button class="diffBtn" data-diff="easy" onclick="selectDiff('easy')">Easy</button>
+      <button class="diffBtn selected" data-diff="normal" onclick="selectDiff('normal')">Normal</button>
+      <button class="diffBtn" data-diff="hard" onclick="selectDiff('hard')">Hard</button>
+      <button class="diffBtn" data-diff="lunatic" onclick="selectDiff('lunatic')">Lunatic</button>
+    </div>
+    <div class="infoRow" style="justify-content:center;gap:20px;">
+      当前角色：<span id="stageCharInfo">雾雨魔理沙</span>
+    </div>
+    <button class="menuBtn" id="startStageBtn" onclick="startSelectedStage()">出击！</button>
+    <button class="menuBtn small" onclick="showTitle()">返回</button>
+  </div>
+
+  <!-- 帮助 -->
+  <div id="helpScreen" class="menuScreen hidden">
+    <div class="sectionTitle">操作说明</div>
+    <div class="hintText" style="font-size:14px;line-height:2.2;">
+      ↑↓←→ 方向键 ：移动<br>
+      Z 键：射击（按住连发）<br>
+      X 键：炸弹（消弹+无敌）<br>
+      Shift 键：低速移动（显示判定点）<br>
+      ESC 键：暂停<br>
+      C 键：清屏技能（消耗1个炸弹）<br><br>
+      擦弹：子弹擦过判定点获得分数<br>
+      符卡取得：不吃炸弹不miss击破符卡
+    </div>
+    <button class="menuBtn" onclick="showTitle()" style="margin-top:20px;">返回</button>
+  </div>
+
+  <!-- 暂停 -->
+  <div id="pauseScreen" class="menuScreen hidden">
+    <div class="sectionTitle">暂停中</div>
+    <button class="menuBtn" onclick="resumeGame()">继续游戏</button>
+    <button class="menuBtn" onclick="restartGame()">重新开始</button>
+    <button class="menuBtn" onclick="quitToTitle()">返回标题</button>
+  </div>
+
+  <!-- 结算 -->
+  <div id="resultScreen" class="menuScreen hidden">
+    <div class="resultBox">
+      <div class="sectionTitle" id="resultTitle">关卡通关！</div>
+      <div class="resultLabel">最终得分</div>
+      <div class="resultScore" id="finalScore">0</div>
+      <div style="color:#88aacc;font-size:14px;line-height:2;">
+        擦弹数：<span id="grazeCount" style="color:#88ddff;">0</span><br>
+        符卡取得：<span id="spellGet" style="color:#88ff88;">0 / 0</span>
+      </div>
+    </div>
+    <button class="menuBtn" id="nextStageBtn" onclick="goNextStage()" style="display:none;">下一关</button>
+    <button class="menuBtn" onclick="restartGame()">重新挑战</button>
+    <button class="menuBtn small" onclick="quitToTitle()">返回标题</button>
+  </div>
+</div>
+
+<script>
+// ==================== 像素风渲染：离屏低分辨率画布 → 主画布2x放大 ====================
+const SCALE = 2;
+const SW = 240, SH = 320; // 内部渲染分辨率（经典东方分辨率）
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const offCanvas = document.createElement('canvas');
+offCanvas.width = SW; offCanvas.height = SH;
+const g = offCanvas.getContext('2d');
+g.imageSmoothingEnabled = false;
+
+// 像素画圆 → 方块圆
+function pxCircle(x, y, r) {
+  const rx = Math.round(x), ry = Math.round(y), rr = Math.round(r);
+  for (let dy = -rr; dy <= rr; dy++) {
+    for (let dx = -rr; dx <= rr; dx++) {
+      if (dx*dx + dy*dy <= rr*rr) g.fillRect(rx+dx, ry+dy, 1, 1);
+    }
+  }
+}
+
+// 像素画空心圆
+function pxStrokeCircle(x, y, r) {
+  const rx = Math.round(x), ry = Math.round(y), rr = Math.round(r);
+  for (let dy = -rr; dy <= rr; dy++) {
+    for (let dx = -rr; dx <= rr; dx++) {
+      const d2 = dx*dx + dy*dy;
+      if (d2 >= (rr-1)*(rr-1) && d2 <= rr*rr) g.fillRect(rx+dx, ry+dy, 1, 1);
+    }
+  }
+}
+
+// 像素画椭圆
+function pxEllipse(x, y, rx, ry) {
+  const mx = Math.round(x), my = Math.round(y), rrx = Math.round(rx), rry = Math.round(ry);
+  for (let dy = -rry; dy <= rry; dy++) {
+    for (let dx = -rrx; dx <= rrx; dx++) {
+      if ((dx*dx)/(rrx*rrx) + (dy*dy)/(rry*rry) <= 1) g.fillRect(mx+dx, my+dy, 1, 1);
+    }
+  }
+}
+
+// 像素画星形
+function pxStar(cx, cy, spikes, outerR, innerR) {
+  let rot = Math.PI/2*3, step = Math.PI/spikes;
+  const pts = [];
+  for (let i = 0; i < spikes; i++) {
+    pts.push([cx+Math.cos(rot)*outerR, cy+Math.sin(rot)*outerR]);
+    rot += step;
+    pts.push([cx+Math.cos(rot)*innerR, cy+Math.sin(rot)*innerR]);
+    rot += step;
+  }
+  // 简化：填充星星区域
+  g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+  g.closePath(); g.fill();
+}
+
+// W, H 使用内部分辨率
+const W = SW, H = SH;
+
+let gameState = 'title';
+let currentChar = 'marisa';
+let difficulty = 'normal';
+let currentStage = 1;
+let score = 0, grazeCount = 0, spellGet = 0, spellTotal = 0;
+let bombUsedThisSpell = false, missThisSpell = false;
+let highestUnlocked = 1;
+
+const stageDefs = [
+  { id:1, name:'樱花林', boss:'露米娅', bg:'sakura', desc:'宵暗的妖怪', bossHP:1200,
+    spells:[{n:'闇符「Darkness」',d:20,hp:250},{n:'夜符「Night Bird」',d:22,hp:280},{n:'终符「闇の帳」',d:25,hp:350}],
+    enemyColor:'#ff99aa', bossColor:'#cc6699' },
+  { id:2, name:'竹林月夜', boss:'慧音', bg:'bamboo', desc:'知识与历史的半兽', bossHP:1600,
+    spells:[{n:'史符「三種の神器」',d:22,hp:300},{n:'虚史「幻想郷伝説」',d:24,hp:350},{n:'终符「日出づる国」',d:26,hp:400}],
+    enemyColor:'#aaddaa', bossColor:'#88ccaa' },
+  { id:3, name:'红魔馆', boss:'帕秋莉', bg:'mansion', desc:'不动的大图书馆', bossHP:2000,
+    spells:[{n:'火符「アグニシャイン」',d:24,hp:350},{n:'水符「プリンセスウンディーネ」',d:24,hp:350},{n:'金符「シルバードラゴン」',d:28,hp:450}],
+    enemyColor:'#cc88ff', bossColor:'#aa55ff' },
+  { id:4, name:'白玉楼', boss:'幽幽子', bg:'nether', desc:'天衣无缝的亡灵', bossHP:2500,
+    spells:[{n:'亡郷「亡我郷」',d:26,hp:400},{n:'桜花「未練未酌宴」',d:28,hp:450},{n:'终符「反魂蝶」',d:30,hp:500}],
+    enemyColor:'#ffb7c5', bossColor:'#ff88aa' },
+  { id:5, name:'地灵殿', boss:'古明地觉', bg:'lava', desc:'地底的怨灵', bossHP:3000,
+    spells:[{n:'想起「テリブルスーヴニール」',d:28,hp:450},{n:'心符「没我の愛」',d:30,hp:500},{n:'终符「地霊殿」',d:32,hp:550}],
+    enemyColor:'#ff8855', bossColor:'#ff6644' },
+  { id:6, name:'雾之湖', boss:'琪露诺', bg:'snow', desc:'最强的冰之妖精', bossHP:3500,
+    spells:[{n:'氷符「アイスクリスタル」',d:25,hp:400},{n:'霜符「フロストコラム」',d:22,hp:450},{n:'寒符「パーフェクトフリーズ」',d:28,hp:500},{n:'雪符「ダイヤモンドブリザード」',d:25,hp:450},{n:'终符「baka」',d:30,hp:600}],
+    enemyColor:'#88ddff', bossColor:'#66ccff' },
+];
+
+const diffConfig = {
+  easy:    { bulletSpeed:0.5, density:0.4, hpMult:0.5, lives:5, bombs:5, playerHP:300,
+    spawnIntervalBase:180, spawnIntervalMin:100, spawnIntervalDecay:18, maxEnemies:2, bigEnemyChance:0.08,
+    enemyShootBase:160, enemyShootRand:80, enemyBulletCount:2, bossDelay:80 },
+  normal:  { bulletSpeed:1.0, density:0.7, hpMult:1.0, lives:3, bombs:3, playerHP:150,
+    spawnIntervalBase:120, spawnIntervalMin:45, spawnIntervalDecay:12, maxEnemies:3, bigEnemyChance:0.25,
+    enemyShootBase:120, enemyShootRand:60, enemyBulletCount:3, bossDelay:50 },
+  hard:    { bulletSpeed:1.3, density:1.2, hpMult:1.3, lives:2, bombs:2, playerHP:100,
+    spawnIntervalBase:90, spawnIntervalMin:30, spawnIntervalDecay:8, maxEnemies:4, bigEnemyChance:0.4,
+    enemyShootBase:90, enemyShootRand:50, enemyBulletCount:4, bossDelay:40 },
+  lunatic: { bulletSpeed:1.6, density:1.6, hpMult:1.6, lives:1, bombs:1, playerHP:80,
+    spawnIntervalBase:60, spawnIntervalMin:20, spawnIntervalDecay:5, maxEnemies:5, bigEnemyChance:0.6,
+    enemyShootBase:60, enemyShootRand:40, enemyBulletCount:5, bossDelay:30 }
+};
+
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.key.toLowerCase()] = true;
+  if (e.key === 'Escape') {
+    if (gameState === 'playing') pauseGame();
+    else if (gameState === 'paused') resumeGame();
+  }
+  if (e.key.toLowerCase() === 'c' && gameState === 'playing' && player && player.bombs > 0) useClearScreen();
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+// ==================== 角色头像绘制（像素风） ====================
+function drawCharAvatars() {
+  // 魔理沙头像
+  const ac1 = document.getElementById('avatarMarisa');
+  if (ac1) {
+    const c1 = ac1.getContext('2d');
+    c1.imageSmoothingEnabled = false;
+    c1.fillStyle = '#1a1a2e'; c1.fillRect(0,0,80,80);
+    // 脸
+    c1.fillStyle = '#fce4d6'; c1.beginPath(); c1.arc(40,44,18,0,Math.PI*2); c1.fill();
+    // 帽子
+    c1.fillStyle = '#222'; c1.beginPath(); c1.moveTo(22,30); c1.lineTo(58,30); c1.lineTo(40,8); c1.closePath(); c1.fill();
+    c1.fillStyle = '#333'; c1.fillRect(15,28,50,8);
+    // 头发
+    c1.fillStyle = '#c9a86c'; c1.fillRect(22,30,16,8); c1.fillRect(42,30,16,8);
+    // 眼睛
+    c1.fillStyle = '#fff'; c1.beginPath(); c1.arc(34,42,5,0,Math.PI*2); c1.arc(46,42,5,0,Math.PI*2); c1.fill();
+    c1.fillStyle = '#cc8833'; c1.beginPath(); c1.arc(34,42,2.5,0,Math.PI*2); c1.arc(46,42,2.5,0,Math.PI*2); c1.fill();
+    // 嘴
+    c1.strokeStyle = '#cc8866'; c1.lineWidth=1.5; c1.beginPath(); c1.arc(40,52,4,0.1,Math.PI-0.1); c1.stroke();
+    // 星星
+    c1.fillStyle = '#ffd700'; c1.font='14px sans-serif'; c1.fillText('★',55,22);
+    // 扫帚
+    c1.strokeStyle = '#886644'; c1.lineWidth=2; c1.beginPath(); c1.moveTo(58,50); c1.lineTo(68,20); c1.stroke();
+    c1.fillStyle = '#886644'; c1.beginPath(); c1.moveTo(63,18); c1.lineTo(75,8); c1.lineTo(72,25); c1.closePath(); c1.fill();
+  }
+  // 灵梦头像（魔理沙同款风格：圆脸+简单矩形）
+  const ac2 = document.getElementById('avatarReimu');
+  if (ac2) {
+    const c2 = ac2.getContext('2d');
+    c2.imageSmoothingEnabled = false;
+    c2.fillStyle = '#2a1a1a'; c2.fillRect(0,0,80,80);
+    // 脸
+    c2.fillStyle = '#fce4d6'; c2.beginPath(); c2.arc(40,44,18,0,Math.PI*2); c2.fill();
+    // 蝴蝶结
+    c2.fillStyle = '#dd2222'; c2.beginPath(); c2.moveTo(28,26); c2.lineTo(52,26); c2.lineTo(40,14); c2.closePath(); c2.fill();
+    c2.fillStyle = '#cc0000'; c2.fillRect(30,24,20,4);
+    // 头发
+    c2.fillStyle = '#4a2810'; c2.fillRect(22,30,16,8); c2.fillRect(42,30,16,8);
+    // 眼睛
+    c2.fillStyle = '#fff'; c2.beginPath(); c2.arc(34,42,5,0,Math.PI*2); c2.arc(46,42,5,0,Math.PI*2); c2.fill();
+    c2.fillStyle = '#553300'; c2.beginPath(); c2.arc(34,42,2.5,0,Math.PI*2); c2.arc(46,42,2.5,0,Math.PI*2); c2.fill();
+    // 嘴
+    c2.strokeStyle = '#cc8866'; c2.lineWidth=1.5; c2.beginPath(); c2.arc(40,52,4,0.1,Math.PI-0.1); c2.stroke();
+    // 巫女服
+    c2.fillStyle = '#dd2222'; c2.fillRect(30,56,20,10);
+    c2.fillStyle = '#ffffff'; c2.fillRect(30,66,20,6);
+    // 御币
+    c2.strokeStyle = '#886644'; c2.lineWidth=2; c2.beginPath(); c2.moveTo(58,50); c2.lineTo(68,20); c2.stroke();
+    c2.fillStyle = '#fff'; c2.fillRect(62,16,12,5);
+    c2.fillStyle = '#eeddcc'; c2.fillRect(64,15,8,3);
+  }
+}
+
+// ==================== 实体类 ====================
+class Player {
+  constructor() {
+    this.x = W/2; this.y = H - 50;
+    this.radius = 3;
+    this.grazeRadius = 7;
+    this.speed = 2.25;
+    this.slowSpeed = 0.9;
+    this.shotCooldown = 0; this.shotDelay = 8;
+    this.power = 4.0;
+    this.lives = diffConfig[difficulty].lives;
+    this.bombs = diffConfig[difficulty].bombs;
+    this.maxHp = diffConfig[difficulty].playerHP;
+    this.hp = this.maxHp;
+    this.invincible = 0;
+    this.bombActive = 0; this.bombDuration = 120;
+    this.optionAngle = 0;
+  }
+
+  update() {
+    let spd = keys['shift'] ? this.slowSpeed : this.speed;
+    let dx = 0, dy = 0;
+    if (keys['arrowleft']) dx -= 1;
+    if (keys['arrowright']) dx += 1;
+    if (keys['arrowup']) dy -= 1;
+    if (keys['arrowdown']) dy += 1;
+    if (dx && dy) spd *= 0.707;
+    this.x += dx * spd; this.y += dy * spd;
+    this.x = Math.max(10, Math.min(W-10, this.x));
+    this.y = Math.max(10, Math.min(H-10, this.y));
+
+    if (this.shotCooldown > 0) this.shotCooldown--;
+    if (keys['z'] && this.shotCooldown <= 0) { this.shoot(); this.shotCooldown = this.shotDelay; }
+    if (keys['x'] && this.bombs > 0 && this.bombActive <= 0) this.useBomb();
+    if (this.invincible > 0) this.invincible--;
+    if (this.bombActive > 0) this.bombActive--;
+    this.optionAngle += 0.03;
+  }
+
+  shoot() {
+    if (currentChar === 'marisa') {
+      if (keys['shift']) {
+        playerBullets.push(new PBullet(this.x, this.y-10, 0, -6, 'laser'));
+      } else {
+        for (let i = -2; i <= 2; i++) {
+          const ang = -Math.PI/2 + i * 0.15;
+          playerBullets.push(new PBullet(this.x+i*3, this.y-5, Math.cos(ang)*4.5, Math.sin(ang)*4.5, 'star'));
+        }
+      }
+    } else {
+      // 灵梦：追踪符（通常）+ 封魔针（集中）
+      if (keys['shift']) {
+        // 封魔针：高速直线针弹
+        for (let i = -1; i <= 1; i++) {
+          playerBullets.push(new PBullet(this.x+i*3, this.y-8, 0, -7, 'needle'));
+        }
+      } else {
+        // 追踪符：自动索敌的御札
+        playerBullets.push(new PBullet(this.x-3, this.y-8, -0.5, -3, 'ofuda'));
+        playerBullets.push(new PBullet(this.x+3, this.y-8, 0.5, -3, 'ofuda'));
+      }
+    }
+  }
+
+  useBomb() {
+    this.bombs--;
+    this.bombActive = this.bombDuration;
+    this.invincible = this.bombDuration + 30;
+    bombUsedThisSpell = true;
+    for (let b of bullets) {
+      if (Math.random() < 0.9) { b.dead = true; createParticle(b.x, b.y, b.color, 2); }
+    }
+    if (boss && !boss.dead) boss.hp -= currentChar === 'marisa' ? 300 : 250;
+    for (let i = 0; i < 50; i++) {
+      createParticle(this.x+(Math.random()-0.5)*100, this.y+(Math.random()-0.5)*100,
+        currentChar==='marisa'?'#ffee66':'#ff4444', 4);
+    }
+  }
+
+  hit(dmg) {
+    this.hp -= dmg;
+    this.invincible = 60;
+    missThisSpell = true;
+    for (let i = 0; i < 20; i++) createParticle(this.x, this.y, '#ff6666', 3);
+    shakeTime = 15;
+    if (this.hp <= 0) {
+      this.lives--;
+      if (this.lives < 0) { gameOver(false); return; }
+      this.hp = this.maxHp;
+      this.power = Math.max(1.0, this.power - 2.0);
+      this.invincible = 120;
+      for (let i = 0; i < 40; i++) createParticle(this.x, this.y, '#ff3366', 4);
+      shakeTime = 30;
+    }
+  }
+
+  draw() {
+    if (this.bombActive > 0) {
+      g.save(); g.globalAlpha = (this.bombActive / this.bombDuration) * 0.3;
+      g.fillStyle = currentChar==='marisa'?'#ffee66':'#ff4444';
+      g.fillRect(0,0,W,H);
+      g.restore();
+    }
+    if (this.invincible > 0 && Math.floor(this.invincible/4)%2 === 0) return;
+
+    g.save(); g.translate(Math.round(this.x), Math.round(this.y));
+    if (currentChar === 'marisa') {
+      // 像素风魔理沙
+      g.fillStyle = '#222'; g.fillRect(-6,-15,12,6); // 帽子
+      g.fillStyle = '#333'; g.fillRect(-7,-17,14,3); // 帽檐
+      g.fillStyle = '#1a1a2e'; g.fillRect(-5,-7,10,12); // 身体
+      g.fillStyle = '#f0e6d2'; g.fillRect(-3,-4,6,8); // 围裙
+      g.fillStyle = '#c9a86c'; g.fillRect(-4,-5,8,3); // 头发
+      g.fillStyle = '#ffd700'; g.fillRect(7,-14,3,3); // 星星
+    } else {
+      // 灵梦（魔理沙同款极简像素风）
+      g.fillStyle = '#dd2222'; g.fillRect(-6,-15,12,6); // 蝴蝶结
+      g.fillStyle = '#cc0000'; g.fillRect(-7,-17,14,3); // 蝴蝶结横带
+      g.fillStyle = '#4a2810'; g.fillRect(-4,-5,8,3); // 头发
+      g.fillStyle = '#dd2222'; g.fillRect(-5,-7,10,12); // 身体（红上衣）
+      g.fillStyle = '#ffffff'; g.fillRect(-3,-1,6,6); // 白衣
+      g.fillStyle = '#dd2222'; g.fillRect(-4,5,8,4); // 绯袴
+      g.fillStyle = '#ffffff'; g.fillRect(6,-8,3,12); // 御币
+    }
+    g.restore();
+
+    if (keys['shift']) {
+      g.save();
+      pxStrokeCircle(this.x, this.y, this.grazeRadius);
+      g.fillStyle = '#ff3366'; pxCircle(this.x, this.y, this.radius+1);
+      g.fillStyle = '#ffffff'; pxCircle(this.x, this.y, this.radius);
+      g.restore();
+    }
+  }
+}
+
+class PBullet {
+  constructor(x,y,vx,vy,type) { this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.type=type;this.radius=type==='laser'?2:1.5;this.damage=type==='laser'?2:1;this.dead=false;this.life=120;this.homingTimer=0; }
+  update() {
+    // 追踪符：自动索敌
+    if (this.type==='ofuda' && this.life > 20) {
+      this.homingTimer++;
+      if (this.homingTimer > 10) {
+        let target = null, minDist = 9999;
+        // 优先追踪Boss
+        if (boss && boss.entered && !boss.dead) target = boss;
+        else {
+          for (let e of enemies) {
+            if (e.dead) continue;
+            const d = Math.sqrt((this.x-e.x)**2 + (this.y-e.y)**2);
+            if (d < minDist) { minDist = d; target = e; }
+          }
+        }
+        if (target) {
+          const ang = Math.atan2(target.y - this.y, target.x - this.x);
+          this.vx += Math.cos(ang) * 0.3;
+          this.vy += Math.sin(ang) * 0.3;
+          const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+          if (spd > 4) { this.vx *= 4/spd; this.vy *= 4/spd; }
+        }
+        this.homingTimer = 0;
+      }
+    }
+    this.x += this.vx; this.y += this.vy; this.life--;
+    if (this.y<-10||this.y>H+10||this.x<-10||this.x>W+10||this.life<=0) this.dead=true;
+  }
+  draw() {
+    g.save();
+    if (this.type==='star') { g.fillStyle='#ffee66'; pxStar(this.x,this.y,5,3,1.5); }
+    else if (this.type==='laser') { g.fillStyle='#ffee66'; g.fillRect(Math.round(this.x)-1, Math.round(this.y)-20, 3, 25); g.fillStyle='#fff'; g.fillRect(Math.round(this.x), Math.round(this.y)-20, 1, 25); }
+    else if (this.type==='ofuda') { g.fillStyle='#ff5555'; g.fillRect(Math.round(this.x)-3, Math.round(this.y)-5, 6, 10); g.fillStyle='#fff'; g.fillRect(Math.round(this.x)-2, Math.round(this.y)-4, 4, 4); }
+    else if (this.type==='needle') { g.fillStyle='#ffffff'; g.fillRect(Math.round(this.x), Math.round(this.y)-10, 1, 12); g.fillStyle='#aaddff'; g.fillRect(Math.round(this.x)-1, Math.round(this.y)-8, 3, 6); }
+    g.restore();
+  }
+}
+
+class Bullet {
+  constructor(x,y,vx,vy,type,color,spellBullet) {
+    this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.type=type||'rice';
+    this.color=color||'#ff6688';this.radius=type==='big'?4:(type==='snowflake'?3:2);
+    this.grazed=false;this.dead=false;this.life=9999;this.angle=0;
+    this.spellBullet=spellBullet||false; // 符卡子弹标记
+    this.spellPulse=Math.random()*Math.PI*2; // 符卡子弹脉冲
+  }
+  update() {
+    const speed = diffConfig[difficulty].bulletSpeed;
+    this.x += this.vx * speed;
+    this.y += this.vy * speed;
+    this.angle += 0.05; this.life--;
+    this.spellPulse += 0.08;
+    // 符卡子弹：只能在飞出屏幕底部后消失，不能中途消失
+    if (this.spellBullet) {
+      if (this.y>H+15||this.y<-30||this.x<-30||this.x>W+30) this.dead=true;
+    } else {
+      if (this.y<-15||this.y>H+15||this.x<-15||this.x>W+15||this.life<=0) this.dead=true;
+    }
+    // 擦弹（不依赖 hitPlayer，始终检查）
+    if (!this.grazed && player && gameState==='playing') {
+      const gdx = this.x - player.x, gdy = this.y - player.y;
+      if ((gdx*gdx + gdy*gdy) < (player.grazeRadius + this.radius)*(player.grazeRadius + this.radius)) {
+        this.grazed = true;
+        grazeCount++;
+        score += 10;
+        createParticle(this.x, this.y, '#ffffff', 1);
+      }
+    }
+  }
+  draw() {
+    g.save();
+    // 符卡子弹：有脉冲光晕，更显眼
+    if (this.spellBullet) {
+      const pulse = 0.5 + Math.sin(this.spellPulse) * 0.5;
+      g.globalAlpha = 0.3 + pulse * 0.3;
+      g.fillStyle = '#ffffff';
+      pxCircle(this.x, this.y, this.radius + 2);
+      g.globalAlpha = 1;
+    }
+    if (this.type==='snowflake') {
+      g.translate(Math.round(this.x), Math.round(this.y));
+      g.fillStyle = this.color;
+      for (let i = 0; i < 4; i++) {
+        g.rotate(Math.PI/2);
+        g.fillRect(0, -this.radius, 1, this.radius*2);
+      }
+      // 符卡雪花：中心亮点
+      if (this.spellBullet) { g.fillStyle='#fff'; g.fillRect(-1,-1,2,2); }
+    } else {
+      g.fillStyle = this.color;
+      pxCircle(this.x, this.y, this.radius);
+      g.fillStyle = '#fff';
+      if (this.type==='big') pxCircle(this.x, this.y, this.radius-1);
+      else pxCircle(this.x, this.y, this.radius-0.5);
+      // 符卡普通弹：中心高亮
+      if (this.spellBullet) { g.fillStyle='#fff'; pxCircle(this.x, this.y, 1); }
+    }
+    g.restore();
+  }
+}
+
+class Enemy {
+  constructor(x,y,type,color) {
+    this.x=x;this.y=y;this.type=type||'fairy';
+    const dc = diffConfig[difficulty];
+    this.hp=(type==='big'?60:30)*dc.hpMult;this.maxHp=this.hp;
+    this.radius=7;this.dead=false;
+    this.shootTimer=dc.enemyShootBase+Math.random()*dc.enemyShootRand;
+    this.moveTimer=0;this.baseX=x;this.color=color||'#66ddff';
+    this.bulletCount=dc.enemyBulletCount;
+    this.spread=dc.density<0.8?0.35:0.2; // Easy 弹幕更散开
+  }
+  update() {
+    this.moveTimer++; this.y += 0.4;
+    this.x = this.baseX + Math.sin(this.moveTimer*0.03)*25;
+    this.shootTimer--;
+    if (this.shootTimer<=0 && this.y>15 && this.y<H-50) {
+      this.shoot();
+      const dc = diffConfig[difficulty];
+      this.shootTimer=dc.enemyShootBase+Math.random()*dc.enemyShootRand;
+    }
+    if (this.y>H+15) this.dead=true;
+    if (this.hp<=0) { this.dead=true; score+=100; for(let i=0;i<15;i++) createParticle(this.x,this.y,'#ffaa44',3); if(Math.random()<0.4) items.push(new Item(this.x,this.y, Math.random()<0.5?'p':'point')); }
+  }
+  shoot() { if(!player)return; const ang=Math.atan2(player.y-this.y,player.x-this.x); const n=this.type==='big'?this.bulletCount+1:this.bulletCount; for(let i=0;i<n;i++){const a=ang+(i-(n-1)/2)*this.spread; bullets.push(new Bullet(this.x,this.y+5,Math.cos(a)*1.25,Math.sin(a)*1.25,'rice',this.color));} }
+  draw() {
+    g.save(); g.translate(Math.round(this.x), Math.round(this.y));
+    g.fillStyle=this.color; pxCircle(0,0,this.radius);
+    g.fillStyle='rgba(255,255,255,0.5)'; g.fillRect(-6,-2,3,4); g.fillRect(3,-2,3,4);
+    g.fillStyle='#fff'; g.fillRect(-2,-1,2,2); g.fillRect(1,-1,2,2);
+    g.restore();
+  }
+}
+
+class Boss {
+  constructor(sd) {
+    this.sd = sd;
+    this.x=W/2; this.y=60; this.radius=15;
+    this.hp = sd.bossHP * diffConfig[difficulty].hpMult;
+    this.maxHp = this.hp;
+    this.dead=false; this.phase=0; this.phaseTimer=0; this.spellIndex=0;
+    this.moveDir=1; this.moveSpeed=0.75;
+    this.spellName=''; this.isSpell=false; this.spellTime=0;
+    this.bakaTimer=0; this.entered=false;
+    this.spells = sd.spells;
+    this.bossColor = sd.bossColor || '#66ccff';
+  }
+
+  enter() { this.entered=true; this.nextPhase(); }
+
+  nextPhase() {
+    this.phase++; this.phaseTimer=0;
+    bombUsedThisSpell=false; missThisSpell=false;
+    if (this.phase%2===0) { this.isSpell=false; this.spellName=''; this.radius=15; }
+    else {
+      const idx=Math.floor(this.phase/2);
+      if (idx < this.spells.length) {
+        this.isSpell=true; this.spellIndex=idx;
+        this.spellName=this.spells[idx].n;
+        this.spellTime=this.spells[idx].d;
+        this.hp=this.spells[idx].hp*diffConfig[difficulty].hpMult;
+        this.maxHp=this.hp; spellTotal++;
+        this.radius=18; // 符卡期间命中判定稍大，更容易打到
+        for (let b of bullets) { createParticle(b.x,b.y,'#88ddff',1); b.dead=true; }
+        // 符卡宣告特效
+        shakeTime=15; slowmoTimer=20;
+        for (let i=0;i<60;i++) createParticle(this.x+(Math.random()-0.5)*60,this.y+(Math.random()-0.5)*30,'#ffffff',5);
+      } else { this.dead=true; gameOver(true); }
+    }
+  }
+
+  update() {
+    if (!this.entered) return; this.phaseTimer++;
+    this.x+=this.moveDir*this.moveSpeed;
+    if (this.x<40) this.moveDir=1; if (this.x>W-40) this.moveDir=-1;
+
+    if (this.isSpell) { this.spellTime-=1/60; if (this.spellTime<=0) { this.nextPhase(); return; } }
+    if (this.isSpell) this.updateSpell(); else this.updateNonspell();
+
+    if (this.hp<=0) {
+      if (this.isSpell) {
+        if (!bombUsedThisSpell && !missThisSpell) { spellGet++; score+=5000; for(let i=0;i<40;i++) createParticle(this.x+(Math.random()-0.5)*50,this.y+(Math.random()-0.5)*30,'#88ddff',4); slowmoTimer=30; }
+        for(let i=0;i<5;i++) items.push(new Item(this.x+(Math.random()-0.5)*40,this.y,['p','point','bombp','livep','point'][i%5]));
+      }
+      this.nextPhase();
+    }
+  }
+
+  updateNonspell() {
+    const si=Math.max(15,30-this.phase*3);
+    if (this.phaseTimer%si===0) { const n=8+this.phase*2; const ba=this.phaseTimer*0.02; for(let i=0;i<n;i++){const ang=ba+(Math.PI*2/n)*i; bullets.push(new Bullet(this.x,this.y+10,Math.cos(ang)*0.9,Math.sin(ang)*0.9+0.5,(this.sd.bg==='snow'||this.sd.boss==='琪露诺')?'snowflake':'rice',this.bossColor,false));} }
+    if (this.phaseTimer%90===0&&player) { const ang=Math.atan2(player.y-this.y,player.x-this.x); for(let i=-1;i<=1;i++) bullets.push(new Bullet(this.x,this.y+10,Math.cos(ang+i*0.1)*1.5,Math.sin(ang+i*0.1)*1.5,'rice',this.bossColor,false)); }
+  }
+
+  updateSpell() {
+    const idx=this.spellIndex, d=diffConfig[difficulty].density;
+    if (this.sd.boss==='琪露诺') {
+      if (idx===0) { if(this.phaseTimer%Math.floor(8/d)===0){const ang=this.phaseTimer*0.08;for(let arm=0;arm<3;arm++){const a=ang+arm*Math.PI*2/3;bullets.push(new Bullet(this.x,this.y+8,Math.cos(a)*1,Math.sin(a)*1+0.25,'snowflake','#aaeeff',true));}} }
+      else if (idx===1) { if(this.phaseTimer%Math.floor(40/d)===0){for(let i=0;i<3;i++){const ex=30+Math.random()*(W-60);bullets.push(new Bullet(ex,-5,0,1.25+Math.random()*0.5,'big','#66ccff',true));}} if(this.phaseTimer%Math.floor(60/d)===0&&player){const ang=Math.atan2(player.y-this.y,player.x-this.x);bullets.push(new Bullet(this.x,this.y+10,Math.cos(ang)*1.75,Math.sin(ang)*1.75,'rice','#88ddff',true));} }
+      else if (idx===2) { if(this.phaseTimer%Math.floor(25/d)===0){const n=16;const ba=this.phaseTimer*0.03;for(let i=0;i<n;i++){const ang=ba+(Math.PI*2/n)*i;bullets.push(new Bullet(this.x,this.y,Math.cos(ang)*0.75,Math.sin(ang)*0.75,'snowflake','#bbddff',true));}} }
+      else if (idx===3) { if(this.phaseTimer%Math.floor(3/d)===0){const sx=Math.random()*W;bullets.push(new Bullet(sx,-5,-0.25+Math.random()*0.5,1.25+Math.random()*0.75,'snowflake','#cceeff',true));} if(this.phaseTimer%Math.floor(120/d)===0&&player){const ang=Math.atan2(player.y-this.y,player.x-this.x);bullets.push(new Bullet(this.x,this.y+10,Math.cos(ang)*1,Math.sin(ang)*1,'big','#66aadd',true));} }
+      else if (idx===4) this.updateBakaSpell();
+    } else {
+      if (this.phaseTimer%Math.floor(12/d)===0) { const n=12+idx*2; const ba=this.phaseTimer*0.04; for(let i=0;i<n;i++){const ang=ba+(Math.PI*2/n)*i;bullets.push(new Bullet(this.x,this.y,Math.cos(ang)*0.75,Math.sin(ang)*0.75+0.25,'rice',this.bossColor,true));} }
+      if (this.phaseTimer%Math.floor(60/d)===0&&player) { const ang=Math.atan2(player.y-this.y,player.x-this.x); for(let i=-2;i<=2;i++) bullets.push(new Bullet(this.x,this.y+10,Math.cos(ang+i*0.08)*1.5,Math.sin(ang+i*0.08)*1.5,'big',this.bossColor,true)); }
+    }
+  }
+
+  updateBakaSpell() {
+    this.bakaTimer++; const d=diffConfig[difficulty].density;
+    if (this.bakaTimer%Math.floor(90/d)===0) { const letters=['B','A','K','A']; const li=Math.floor(this.bakaTimer/90)%4; this.spawnLetter(letters[li]); }
+    if (this.bakaTimer%Math.floor(10/d)===0) { const ang=Math.random()*Math.PI*2; bullets.push(new Bullet(this.x,this.y,Math.cos(ang)*0.75,Math.sin(ang)*0.75+0.25,'snowflake','#aaddff',true)); }
+    if (difficulty!=='easy'&&this.bakaTimer%Math.floor(100/d)===0&&player) { const ang=Math.atan2(player.y-this.y,player.x-this.x); bullets.push(new Bullet(this.x,this.y+10,Math.cos(ang)*1.5,Math.sin(ang)*1.5,'rice','#6699ff',true)); }
+  }
+
+  spawnLetter(char) {
+    const pat={
+      'B':[[0,0],[1,0],[2,0],[0,1],[2,1],[0,2],[1,2],[2,2],[0,3],[2,3],[0,4],[1,4],[2,4]],
+      'A':[[1,0],[0,1],[2,1],[0,2],[1,2],[2,2],[0,3],[2,3],[0,4],[2,4]],
+      'K':[[0,0],[2,0],[0,1],[1,1],[0,2],[1,2],[0,3],[1,3],[0,4],[2,4]],
+    };
+    const p=pat[char]||pat['A']; const sx=40+Math.random()*(W-80);
+    for (let pt of p) bullets.push(new Bullet(sx+pt[0]*4,-10+pt[1]*4,0,0.6,'big','#88ccff',true));
+  }
+
+  draw() {
+    if (!this.entered) return;
+    g.save(); g.translate(Math.round(this.x), Math.round(this.y));
+    if (this.sd.boss==='琪露诺') {
+      // ═══ 琪露诺像素立绘 ═══
+      // 冰晶翅膀（左侧）
+      g.fillStyle='#88ccff'; g.fillRect(-18,-4,6,2); g.fillRect(-20,-2,4,2); g.fillRect(-22,0,3,2);
+      g.fillStyle='#aaddff'; g.fillRect(-17,-6,4,2); g.fillRect(-18,-4,3,2);
+      g.fillStyle='#cceeff'; g.fillRect(-16,-8,2,2);
+      // 冰晶翅膀（右侧）
+      g.fillStyle='#88ccff'; g.fillRect(12,-4,6,2); g.fillRect(16,-2,4,2); g.fillRect(19,0,3,2);
+      g.fillStyle='#aaddff'; g.fillRect(13,-6,4,2); g.fillRect(15,-4,3,2);
+      g.fillStyle='#cceeff'; g.fillRect(14,-8,2,2);
+
+      // 身体/连衣裙
+      g.fillStyle='#4488dd'; g.fillRect(-8,2,16,16);
+      g.fillStyle='#5599ee'; g.fillRect(-7,2,7,15); g.fillRect(0,2,7,15);
+      g.fillStyle='#3377cc'; g.fillRect(-6,4,12,8);
+      // 裙摆
+      g.fillStyle='#3377cc'; g.fillRect(-10,14,20,6);
+      g.fillStyle='#5599ee'; g.fillRect(-9,15,18,4);
+      // 领结
+      g.fillStyle='#88ccff'; g.fillRect(-3,2,6,4);
+      g.fillStyle='#aaddff'; g.fillRect(-2,3,4,2);
+
+      // 腿
+      g.fillStyle='#f0f8ff'; g.fillRect(-5,18,4,5); g.fillRect(1,18,4,5);
+      // 小鞋子
+      g.fillStyle='#3377cc'; g.fillRect(-6,21,5,3); g.fillRect(1,21,5,3);
+
+      // 头发（后发）
+      g.fillStyle='#66ccff'; g.fillRect(-9,-6,18,4);
+      g.fillStyle='#88ddff'; g.fillRect(-10,-4,20,4);
+      // 侧发
+      g.fillStyle='#66ccff'; g.fillRect(-10,-6,3,12); g.fillRect(7,-6,3,12);
+
+      // 脸
+      g.fillStyle='#f0f8ff'; g.fillRect(-6,-8,12,12);
+      g.fillStyle='#ffffff'; g.fillRect(-4,-7,8,10);
+
+      // 眼睛
+      g.fillStyle='#fff'; g.fillRect(-5,-5,4,5); g.fillRect(1,-5,4,5);
+      g.fillStyle='#3366aa'; g.fillRect(-4,-5,3,4); g.fillRect(2,-5,3,4);
+      g.fillStyle='#113355'; g.fillRect(-4,-5,2,3); g.fillRect(2,-5,2,3);
+      g.fillStyle='#fff'; g.fillRect(-4,-6,1,2); g.fillRect(2,-6,1,2); // 高光
+      // 眉毛
+      g.fillStyle='#3366aa'; g.fillRect(-4,-7,3,1); g.fillRect(1,-7,3,1);
+
+      // 腮红
+      g.fillStyle='#ffaaaa'; g.fillRect(-5,-2,2,2); g.fillRect(3,-2,2,2);
+
+      // 嘴
+      g.fillStyle='#cc6688'; g.fillRect(-1,1,2,1);
+
+      // 冰晶发饰
+      g.fillStyle='#cceeff'; g.fillRect(-2,-11,4,4);
+      g.fillStyle='#ffffff'; g.fillRect(-1,-10,2,2);
+      g.fillStyle='#88ccff'; g.fillRect(-3,-10,1,2); g.fillRect(2,-10,1,2);
+      g.fillRect(-1,-12,2,1);
+
+      // ⑨ 标记
+      if (this.bakaTimer%180<120) {
+        g.fillStyle='#ffffff'; g.font='bold 6px monospace'; g.textAlign='center';
+        g.fillText('⑨', 0, 12);
+      }
+
+      // baka气泡
+      if (this.isSpell&&this.spellIndex>=4&&this.bakaTimer%120<60) {
+        g.fillStyle='#fff';
+        g.fillRect(14,-24,22,9);
+        g.strokeStyle='#88ccff'; g.lineWidth=1;
+        g.strokeRect(14,-24,22,9);
+        g.fillStyle='#ff6688'; g.font='bold 8px sans-serif'; g.textAlign='center';
+        g.fillText('BAKA!', 25, -18);
+        // 气泡三角
+        g.fillStyle='#fff'; g.fillRect(18,-15,3,4);
+        g.strokeStyle='#88ccff'; g.beginPath(); g.moveTo(18,-15); g.lineTo(21,-15); g.lineTo(20,-11); g.closePath(); g.stroke();
+      }
+    } else {
+      // 其他Boss
+      g.fillStyle=this.bossColor; pxCircle(0,0,this.radius);
+      g.fillStyle='#fff'; g.fillRect(-5,-3,3,3); g.fillRect(2,-3,3,3);
+      g.fillStyle='#000'; g.fillRect(-5,-3,1,1); g.fillRect(2,-3,1,1);
+      g.fillStyle='rgba(255,255,255,0.3)'; g.fillRect(-12,2,8,4); g.fillRect(4,2,8,4);
+    }
+    g.restore();
+  }
+}
+
+class Item {
+  constructor(x,y,type) { this.x=x;this.y=y;this.type=type;this.vy=-1;this.vx=(Math.random()-0.5)*1;this.dead=false;this.radius=4;this.life=600; }
+  update() {
+    this.life--; this.vy+=0.025; if(this.vy>0.75) this.vy=0.75; this.x+=this.vx; this.y+=this.vy;
+    if (player) { const dist=Math.sqrt((this.x-player.x)**2+(this.y-player.y)**2); if((player.power>=4.0&&dist<100)||(player.y<75&&dist<75)){const ang=Math.atan2(player.y-this.y,player.x-this.x);this.vx+=Math.cos(ang)*0.15;this.vy+=Math.sin(ang)*0.15;} }
+    if (this.y>H+10||this.life<=0) this.dead=true;
+    if (player) { const dx=this.x-player.x,dy=this.y-player.y; if(Math.sqrt(dx*dx+dy*dy)<this.radius+5) this.pickup(); }
+  }
+  pickup() {
+    this.dead=true;
+    switch(this.type) {
+      case 'p': player.power=Math.min(4.0,player.power+1.0); score+=50; break;
+      case 'point': score+=500; break;
+      case 'bombp': player.bombs=Math.min(8,player.bombs+1); score+=100; break;
+      case 'livep': player.lives=Math.min(8,player.lives+1); score+=100; break;
+      case 'heal': player.hp=Math.min(player.maxHp, player.hp+30); break;
+    }
+    for(let i=0;i<5;i++) createParticle(this.x,this.y,'#88ddff',2);
+  }
+  draw() {
+    g.save(); g.translate(Math.round(this.x), Math.round(this.y));
+    let color='#88ddff';
+    switch(this.type) { case 'p':color='#ff6666';break; case 'point':color='#6688ff';break; case 'bombp':color='#88ff88';break; case 'livep':color='#ffaaee';break; case 'heal':color='#ff88aa';break; }
+    g.fillStyle=color; pxCircle(0,0,this.radius);
+    g.fillStyle='#fff'; g.fillRect(-1,-1,2,2);
+    g.restore();
+  }
+}
+
+// ==================== 粒子 & 背景 ====================
+let particles = [];
+function createParticle(x,y,color,size) { particles.push({x,y,vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*2,life:30,maxLife:30,color,size:size||2}); }
+function updateParticles() { for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.95;p.vy*=0.95;p.life--;if(p.life<=0)particles.splice(i,1);} }
+function drawParticles() { for(let p of particles){g.fillStyle=p.color;g.fillRect(Math.round(p.x), Math.round(p.y), Math.round(p.size*(p.life/p.maxLife)), Math.round(p.size*(p.life/p.maxLife)));} }
+
+let bgStars=[], petals=[], extraParticles=[], bgFrame=0, bgType='sakura';
+
+function initBG() {
+  bgStars=[]; for(let i=0;i<30;i++) bgStars.push({x:Math.random()*W,y:Math.random()*H,size:Math.random()*1.5+0.5,speed:Math.random()*0.25+0.1,twinkle:Math.random()*Math.PI*2});
+  petals=[]; extraParticles=[]; bgFrame=0;
+  if (bgType==='sakura'||bgType==='nether') for(let i=0;i<15;i++) petals.push({x:Math.random()*W,y:Math.random()*H*0.7,size:Math.random()*3+3,speed:Math.random()*0.4+0.25,sway:Math.random()*Math.PI*2,swaySpeed:Math.random()*0.02+0.01});
+  if (bgType==='snow') for(let i=0;i<20;i++) petals.push({x:Math.random()*W,y:Math.random()*H,size:Math.random()*3+3,speed:Math.random()*0.4+0.25,sway:Math.random()*Math.PI*2,swaySpeed:Math.random()*0.02+0.01});
+  if (bgType==='bamboo') for(let i=0;i<12;i++) extraParticles.push({x:Math.random()*W,y:Math.random()*H*0.7,life:Math.random()*60+60,baseLife:60,alpha:0});
+  if (bgType==='mansion') for(let i=0;i<6;i++) extraParticles.push({x:Math.random()*W,y:Math.random()*H*0.5,vx:(Math.random()-0.5)*1.5,vy:(Math.random()-0.5)*1,size:Math.random()*2+2,wing:Math.random()*Math.PI*2});
+  if (bgType==='lava') for(let i=0;i<15;i++) extraParticles.push({x:Math.random()*W,y:H-20-Math.random()*15,size:Math.random()*2+1,vy:-(Math.random()*0.4+0.15),life:Math.random()*60+30});
+  if (bgType==='nether') for(let i=0;i<8;i++) extraParticles.push({x:Math.random()*W,y:Math.random()*H*0.7,vx:(Math.random()-0.5)*0.5,vy:-(Math.random()*0.3+0.1),life:Math.random()*120+60,alpha:0});
+}
+
+function drawBG(type) {
+  bgType=type;
+  // === 天空渐变 ===
+  const gradients = {
+    sakura: ['#1a0a20','#2a1030','#1a0a1a'],
+    bamboo: ['#050515','#0a1a0a','#050a05'],
+    mansion: ['#050000','#150010','#0a0005'],
+    nether:  ['#0a0020','#150a25','#0a0515'],
+    lava:   ['#0a0000','#1a0005','#0a0000'],
+    snow:   ['#050a1a','#0a1525','#08101a']
+  };
+  const c = gradients[type] || gradients.sakura;
+  for (let i=0;i<H;i++) {
+    const t=i/H;
+    if (t<0.5) { const s=t*2; g.fillStyle=lerpColor(c[0],c[1],s); g.fillRect(0,i,W,1); }
+    else { const s=(t-0.5)*2; g.fillStyle=lerpColor(c[1],c[2],s); g.fillRect(0,i,W,1); }
+  }
+
+  // === 星空（通用） ===
+  for (let s of bgStars) { s.y+=s.speed; s.twinkle+=0.05; if(s.y>H){s.y=0;s.x=Math.random()*W;} const alpha=0.4+Math.sin(s.twinkle)*0.3; g.fillStyle=`rgba(255,255,255,${alpha})`; g.fillRect(Math.round(s.x),Math.round(s.y),Math.round(s.size),Math.round(s.size)); }
+
+  // === 关卡主题场景 ===
+  switch(type){
+    case 'sakura': drawSakuraBG(); break;
+    case 'bamboo': drawBambooBG(); break;
+    case 'mansion': drawMansionBG(); break;
+    case 'nether': drawNetherBG(); break;
+    case 'lava': drawLavaBG(); break;
+    case 'snow': drawSnowBG(); break;
+  }
+  bgFrame++;
+}
+
+// === 樱花林：樱花树 + 草地 + 花瓣 ===
+function drawSakuraBG() {
+  // 草地
+  g.fillStyle='#0a1a0a'; g.fillRect(0,H-30,W,30);
+  g.fillStyle='#0d200d'; g.fillRect(0,H-32,W,3);
+  // 左侧樱花树
+  drawTree(10, H-35, 35, 50, '#2a1508', '#ff8899', '#ffb7c5');
+  drawTree(50, H-38, 25, 42, '#2a1508', '#ffaabb', '#ffd0d8');
+  // 右侧樱花树
+  drawTree(W-10, H-35, 35, 50, '#2a1508', '#ff8899', '#ffb7c5');
+  drawTree(W-50, H-38, 25, 42, '#2a1508', '#ffaabb', '#ffd0d8');
+  // 飘落花瓣
+  for (let p of petals) {
+    p.y+=p.speed; p.sway+=p.swaySpeed; p.x+=Math.sin(p.sway)*0.3;
+    if(p.y>H-28){p.y=-5;p.x=Math.random()*W;}
+    g.fillStyle='#ffb7c5';
+    g.fillRect(Math.round(p.x), Math.round(p.y), Math.round(p.size*0.5), Math.round(p.size*0.5));
+  }
+}
+
+// === 竹林月夜：月亮 + 竹竿 + 萤火虫 ===
+function drawBambooBG() {
+  // 满月
+  g.fillStyle='#ffffee'; g.beginPath(); g.arc(W-40, 40, 22, 0, Math.PI*2); g.fill();
+  g.fillStyle='#ffffcc'; g.beginPath(); g.arc(W-40, 40, 18, 0, Math.PI*2); g.fill();
+  // 月光晕
+  g.fillStyle='rgba(255,255,200,0.03)'; g.beginPath(); g.arc(W-40,40,32,0,Math.PI*2); g.fill();
+  // 地面
+  g.fillStyle='#0a0a0a'; g.fillRect(0,H-25,W,25);
+  g.fillStyle='#0d0f0d'; g.fillRect(0,H-27,W,3);
+  // 竹子（垂直杆+竹节）
+  const bambooPositions = [15, 30, 50, 70, 90, W-20, W-40, W-55, W-75, W-95];
+  for (let bx of bambooPositions) {
+    const height = 60 + Math.sin(bx)*20;
+    g.fillStyle='#1a3a1a'; g.fillRect(bx-2, H-30-height, 4, height);
+    g.fillStyle='#2a5a2a'; g.fillRect(bx-1, H-30-height, 2, height);
+    // 竹节
+    for (let j=H-30-height+15; j<H-30; j+=15) {
+      g.fillStyle='#0a200a'; g.fillRect(bx-3, j, 6, 2);
+    }
+    // 竹叶
+    g.fillStyle='#1a4a1a'; g.fillRect(bx-4, H-30-height-4, 8, 3);
+    g.fillRect(bx+2, H-30-height-3, 6, 2);
+  }
+  // 萤火虫
+  for (let ff of extraParticles) {
+    ff.life--; if(ff.life<=0){ff.x=Math.random()*W;ff.y=Math.random()*H*0.7;ff.life=ff.baseLife+Math.random()*60;}
+    ff.alpha=(ff.life<30?ff.life/30:(ff.life>ff.baseLife-30?(ff.baseLife-ff.life)/30:1));
+    ff.x+=Math.sin(bgFrame*0.05+ff.y*0.1)*0.3;
+    ff.y+=Math.cos(bgFrame*0.05+ff.x*0.1)*0.2;
+    g.fillStyle=`rgba(255,255,150,${ff.alpha*0.8})`;
+    g.fillRect(Math.round(ff.x),Math.round(ff.y),2,2);
+    g.fillStyle=`rgba(200,255,100,${ff.alpha*0.3})`;
+    g.fillRect(Math.round(ff.x)-1,Math.round(ff.y)-1,4,4);
+  }
+}
+
+// === 红魔馆：洋馆剪影 + 红月 + 蝙蝠 ===
+function drawMansionBG() {
+  // 血红之月
+  g.fillStyle='#cc2222'; g.beginPath(); g.arc(W-35, 35, 20, 0, Math.PI*2); g.fill();
+  g.fillStyle='#ff4444'; g.beginPath(); g.arc(W-35, 35, 16, 0, Math.PI*2); g.fill();
+  g.fillStyle='rgba(255,50,50,0.04)'; g.beginPath(); g.arc(W-35,35,30,0,Math.PI*2); g.fill();
+  // 地面
+  g.fillStyle='#0a0000'; g.fillRect(0,H-35,W,35);
+  // 洋馆主体
+  // 主楼
+  g.fillStyle='#0a000a'; g.fillRect(60, H-90, 70, 60);
+  // 主楼屋顶（三角）
+  g.fillStyle='#0a000a'; g.beginPath(); g.moveTo(55,H-90); g.lineTo(95,H-110); g.lineTo(135,H-90); g.closePath(); g.fill();
+  // 左塔
+  g.fillStyle='#0a000a'; g.fillRect(55, H-95, 18, 62);
+  g.fillStyle='#0a000a'; g.beginPath(); g.moveTo(52,H-95); g.lineTo(64,H-108); g.lineTo(76,H-95); g.closePath(); g.fill();
+  // 右塔
+  g.fillStyle='#0a000a'; g.fillRect(117, H-95, 18, 62);
+  g.fillStyle='#0a000a'; g.beginPath(); g.moveTo(114,H-95); g.lineTo(126,H-108); g.lineTo(138,H-95); g.closePath(); g.fill();
+  // 窗户（黄色光）
+  g.fillStyle='#ffcc44'; g.fillRect(75, H-80, 6, 8); g.fillRect(90, H-80, 6, 8);
+  g.fillRect(105, H-80, 6, 8); g.fillRect(75, H-65, 6, 8);
+  // 大门
+  g.fillStyle='#ffcc44'; g.fillRect(88, H-55, 14, 22);
+  g.fillStyle='#0a000a'; g.fillRect(90, H-55, 4, 22); g.fillRect(96, H-55, 4, 22);
+  // 蝙蝠
+  for (let b of extraParticles) {
+    b.x+=b.vx; b.y+=b.vy; b.wing+=0.15;
+    if(b.x<0||b.x>W||b.y<0||b.y>H*0.6){b.x=Math.random()*W;b.y=Math.random()*H*0.5;}
+    g.fillStyle='#1a0000';
+    const wingFlap=Math.sin(b.wing)*3;
+    g.fillRect(Math.round(b.x-wingFlap), Math.round(b.y), b.size+wingFlap, b.size*0.5);
+    g.fillRect(Math.round(b.x+wingFlap), Math.round(b.y), b.size+wingFlap, b.size*0.5);
+  }
+}
+
+// === 白玉楼：幽灵樱树 + 亡灵 + 阶梯 ===
+function drawNetherBG() {
+  // 幽灵月光
+  g.fillStyle='rgba(200,180,255,0.15)'; g.beginPath(); g.arc(W/2, 50, 50, 0, Math.PI*2); g.fill();
+  // 白玉楼阶梯
+  g.fillStyle='#1a1520'; g.fillRect(0, H-50, W, 50);
+  const steps = 6;
+  for (let i=0; i<steps; i++) {
+    const sy = H-50 + i*8;
+    g.fillStyle='#2a2535'; g.fillRect(20+i*8, sy, W-40-i*16, 3);
+  }
+  // 幽灵樱树（苍白色）
+  drawTree(15, H-55, 30, 45, '#1a1020', '#bbaacc', '#ddccee');
+  drawTree(W-15, H-55, 30, 45, '#1a1020', '#bbaacc', '#ddccee');
+  drawTree(W/2, H-58, 20, 35, '#1a1020', '#ccbbdd', '#eeddff');
+  // 飘落花瓣（苍白）
+  for (let p of petals) {
+    p.y+=p.speed*0.5; p.sway+=p.swaySpeed; p.x+=Math.sin(p.sway)*0.3;
+    if(p.y>H-48){p.y=-5;p.x=Math.random()*W;}
+    g.fillStyle='#ddaadd'; g.fillRect(Math.round(p.x), Math.round(p.y), Math.round(p.size*0.4), Math.round(p.size*0.4));
+  }
+  // 亡灵（白色光点飘动）
+  for (let sp of extraParticles) {
+    sp.life--; if(sp.life<=0){sp.x=Math.random()*W;sp.y=Math.random()*H*0.6;sp.life=120+Math.random()*60;}
+    sp.x+=sp.vx; sp.y+=sp.vy;
+    const alpha = sp.life<30?sp.life/30:1;
+    g.fillStyle=`rgba(255,255,255,${alpha*0.6})`;
+    g.fillRect(Math.round(sp.x), Math.round(sp.y), 3, 3);
+    g.fillStyle=`rgba(200,180,255,${alpha*0.2})`;
+    g.fillRect(Math.round(sp.x)-2, Math.round(sp.y)-2, 7, 7);
+  }
+}
+
+// === 地灵殿：洞穴 + 熔岩河 + 水晶 ===
+function drawLavaBG() {
+  // 洞穴天花板
+  g.fillStyle='#0a0005'; g.fillRect(0,0,W,25);
+  // 钟乳石
+  g.fillStyle='#1a0510'; g.fillRect(20,15,4,12); g.fillRect(80,18,3,10); g.fillRect(140,14,5,14); g.fillRect(200,16,4,11);
+  g.fillStyle='#0a0005'; g.fillRect(20,10,2,8); g.fillRect(30,18,3,6); g.fillRect(100,15,2,7);
+  g.fillRect(160,10,3,6); g.fillRect(190,14,4,5);
+  // 洞穴墙壁
+  g.fillStyle='#0a0005'; g.fillRect(0,25,8,H-60); g.fillRect(W-8,25,8,H-60);
+  g.fillStyle='#1a0510'; g.fillRect(0,40,4,H-70); g.fillRect(W-4,40,4,H-70);
+  // 熔岩河
+  g.fillStyle='#1a0000'; g.fillRect(0,H-35,W,35);
+  const lavaColors = ['#ff3300','#ff5500','#ff4400','#ff6622','#ff2200'];
+  for (let i=0; i<W; i+=2) {
+    const h = H-35 + Math.sin(i*0.3 + bgFrame*0.03)*3 + Math.sin(i*0.7 + bgFrame*0.05)*2;
+    g.fillStyle = lavaColors[Math.floor(Math.random()*lavaColors.length)];
+    g.fillRect(i, Math.round(h), 2, 3);
+  }
+  // 岩浆表面
+  g.fillStyle='#ff3300'; g.fillRect(0,H-33,W,2);
+  g.fillStyle='#ff6622'; g.fillRect(0,H-35,W,2);
+  // 水晶
+  g.fillStyle='#ff4488'; g.fillRect(35, H-50, 3, 8); g.fillStyle='#ff66aa'; g.fillRect(36, H-52, 1, 3);
+  g.fillStyle='#ff3366'; g.fillRect(165, H-55, 4, 10); g.fillStyle='#ff5588'; g.fillRect(166, H-58, 2, 4);
+  g.fillStyle='#ff4488'; g.fillRect(195, H-48, 3, 7);
+  // 上升火花
+  for (let sp of extraParticles) {
+    sp.y+=sp.vy; sp.life--;
+    if(sp.life<=0){sp.x=Math.random()*W;sp.y=H-35-Math.random()*10;sp.life=60+Math.random()*30;}
+    const alpha = sp.life<20?sp.life/20:1;
+    g.fillStyle=`rgba(255,100,50,${alpha*0.7})`;
+    g.fillRect(Math.round(sp.x), Math.round(sp.y), sp.size, sp.size);
+    g.fillStyle=`rgba(255,200,100,${alpha*0.3})`;
+    g.fillRect(Math.round(sp.x)-1, Math.round(sp.y)-1, sp.size+2, sp.size+2);
+  }
+}
+
+// === 雾之湖：冰湖 + 冰晶 + 暴风雪 ===
+function drawSnowBG() {
+  // 冰面
+  g.fillStyle='#0a1a2e'; g.fillRect(0,H-40,W,40);
+  g.fillStyle='#0d2440'; g.fillRect(0,H-42,W,3);
+  // 冰面反射
+  g.fillStyle='rgba(100,180,220,0.08)'; g.fillRect(0,H-35,W,2);
+  // 冰晶
+  const iceCrystals = [20, 60, 100, 140, 180, 220];
+  for (let ix of iceCrystals) {
+    const iy = H-45 + Math.sin(ix*0.5 + bgFrame*0.01)*3;
+    g.fillStyle='#aaddff'; g.fillRect(ix-1, iy-4, 2, 8);
+    g.fillRect(ix-4, iy-1, 8, 2);
+    g.fillStyle='#88ccff'; g.fillRect(ix, iy-3, 1, 6); g.fillRect(ix-3, iy, 6, 1);
+    g.fillStyle='#ffffff'; g.fillRect(ix, iy, 1, 1);
+  }
+  // 雪覆盖的树
+  drawTree(15, H-45, 20, 35, '#1a2a3a', '#cce0f0', '#ffffff');
+  drawTree(W-15, H-45, 20, 35, '#1a2a3a', '#cce0f0', '#ffffff');
+  drawTree(W/2, H-48, 15, 28, '#1a2a3a', '#d0e4f4', '#ffffff');
+  // 暴风雪
+  for (let p of petals) {
+    p.y+=p.speed*1.5; p.sway+=p.swaySpeed; p.x+=Math.sin(p.sway)*0.6;
+    if(p.y>H-38){p.y=-5;p.x=Math.random()*W;}
+    g.fillStyle='#cceeff';
+    g.fillRect(Math.round(p.x), Math.round(p.y), Math.round(p.size*0.3), Math.round(p.size*0.3));
+    g.fillStyle='rgba(255,255,255,0.6)';
+    g.fillRect(Math.round(p.x)-1, Math.round(p.y)-1, Math.round(p.size*0.2), Math.round(p.size*0.2));
+  }
+  // 雾气
+  g.fillStyle='rgba(150,200,230,0.03)'; g.fillRect(0, H-60, W, 25);
+}
+
+// === 通用：画树（树干+树冠） ===
+function drawTree(tx, ty, h, w, trunkColor, crownColor, highlightColor) {
+  // 树干
+  g.fillStyle=trunkColor; g.fillRect(tx-2, ty-h, 4, h);
+  // 树冠（多层圆形模拟）
+  g.fillStyle=crownColor;
+  g.fillRect(tx-w*0.4, ty-h*0.9, w*0.8, h*0.5);
+  g.fillRect(tx-w*0.5, ty-h*0.7, w, h*0.4);
+  g.fillRect(tx-w*0.3, ty-h*0.55, w*0.6, h*0.3);
+  // 高光
+  g.fillStyle=highlightColor;
+  g.fillRect(tx-w*0.25, ty-h*0.75, w*0.3, h*0.2);
+  g.fillRect(tx-w*0.15, ty-h*0.55, w*0.2, h*0.15);
+}
+
+// === 颜色插值 ===
+function lerpColor(c1, c2, t) {
+  const r1=parseInt(c1.slice(1,3),16),g1=parseInt(c1.slice(3,5),16),b1=parseInt(c1.slice(5,7),16);
+  const r2=parseInt(c2.slice(1,3),16),g2=parseInt(c2.slice(3,5),16),b2=parseInt(c2.slice(5,7),16);
+  const r=Math.round(r1+(r2-r1)*t),g=Math.round(g1+(g2-g1)*t),b=Math.round(b1+(b2-b1)*t);
+  return '#'+r.toString(16).padStart(2,'0')+g.toString(16).padStart(2,'0')+b.toString(16).padStart(2,'0');
+}
+
+// ==================== HUD ====================
+function drawHUD() {
+  g.save();
+  g.fillStyle='rgba(10,26,46,0.7)'; g.fillRect(0,0,W,26);
+  g.strokeStyle='rgba(102,204,255,0.3)'; g.beginPath(); g.moveTo(0,26); g.lineTo(W,26); g.stroke();
+
+  g.fillStyle='#88ddff'; g.font='bold 8px monospace'; g.textAlign='left';
+  g.fillText('SCORE:'+score.toLocaleString(),2,9);
+  g.fillStyle='#88aacc'; g.font='6px monospace';
+  g.fillText('Graze:'+grazeCount+'|STAGE:'+currentStage,2,18);
+
+  g.textAlign='right';
+  let livesStr=''; for(let i=0;i<player.lives;i++) livesStr+='♥';
+  g.fillStyle='#ffaaaa'; g.font='6px sans-serif'; g.fillText('LIFE:'+livesStr,W-2,9);
+  let bombStr=''; for(let i=0;i<player.bombs;i++) bombStr+='◆';
+  g.fillStyle='#88ff88'; g.fillText('BOMB:'+bombStr,W-2,17);
+  g.fillStyle='#88ccff'; g.font='5px monospace'; g.fillText('Power:'+player.power.toFixed(2),W-2,24);
+
+  // HP 血条
+  const hpBarW=60, hpBarX=W-2-hpBarW, hpBarY=2;
+  g.fillStyle='#333'; g.fillRect(hpBarX,hpBarY,hpBarW,5);
+  const hpRatio=Math.max(0,player.hp/player.maxHp);
+  g.fillStyle=hpRatio<0.3?'#ff3344':hpRatio<0.6?'#ffaa44':'#44ff66';
+  g.fillRect(hpBarX,hpBarY,Math.round(hpBarW*hpRatio),5);
+  g.strokeStyle='#666'; g.strokeRect(hpBarX,hpBarY,hpBarW,5);
+
+  // Boss血条
+  if (boss && boss.entered && !boss.dead) {
+    const barY=H-20;
+    g.fillStyle='rgba(0,0,0,0.5)'; g.fillRect(0,barY-3,W,23);
+    if (boss.isSpell && boss.spellName) {
+      g.fillStyle='#88ddff'; g.font='bold 7px sans-serif'; g.textAlign='center';
+      g.fillText(boss.spellName,W/2,barY+4);
+      g.fillStyle=boss.spellTime<5?'#ff6666':'#88ff88'; g.font='6px monospace';
+      g.fillText(boss.spellTime.toFixed(1)+'s',W/2,barY+12);
+    }
+    const barW=W-20, hpR=Math.max(0,boss.hp/boss.maxHp);
+    g.fillStyle='#333'; g.fillRect(10,barY+14,barW,3);
+    g.fillStyle=boss.isSpell?'#ff88aa':'#66ccff';
+    g.fillRect(10,barY+14,Math.round(barW*hpR),3);
+    // 符卡宣告文字（前2秒）
+    if (boss.isSpell && boss.phaseTimer < 120) {
+      const alpha = boss.phaseTimer < 60 ? 1 : 1 - (boss.phaseTimer-60)/60;
+      g.globalAlpha = alpha;
+      g.fillStyle = '#ffffff'; g.font = 'bold 10px sans-serif'; g.textAlign = 'center';
+      g.fillText('SPELL CARD !', W/2, barY-5);
+      g.globalAlpha = 1;
+    }
+  }
+  g.restore();
+}
+
+// ==================== 清屏技能 ====================
+function useClearScreen() {
+  if (player.bombs <= 0) return;
+  player.bombs--;
+  player.invincible = 60;
+  bombUsedThisSpell = true;
+  for (let b of bullets) { b.dead = true; createParticle(b.x, b.y, '#ffffff', 2); }
+  for (let e of enemies) { e.dead = true; score += 100; for(let i=0;i<10;i++) createParticle(e.x, e.y, '#ffaa44', 3); }
+  enemies = [];
+  if (boss && !boss.dead) boss.hp -= 500;
+  for (let i = 0; i < 80; i++) {
+    createParticle(player.x+(Math.random()-0.5)*W, player.y+(Math.random()-0.5)*H, '#ffffff', 5);
+  }
+  shakeTime = 25;
+  slowmoTimer = 20;
+}
+
+// ==================== 游戏主逻辑 ====================
+let player, boss, playerBullets=[], bullets=[], enemies=[], items=[];
+let shakeTime=0, slowmoTimer=0, gameTimer=0, spawnTimer=0, bossSpawned=false;
+
+function startGameLogic() {
+  const sd = stageDefs[currentStage-1];
+  player = new Player();
+  boss = null;
+  playerBullets=[]; bullets=[]; enemies=[]; items=[]; particles=[];
+  score=0; grazeCount=0; spellGet=0; spellTotal=0;
+  gameTimer=0; spawnTimer=0; bossSpawned=false; shakeTime=0;
+  bgType = sd.bg;
+  initBG();
+}
+
+function updateGame() {
+  gameTimer++;
+  if (slowmoTimer>0) slowmoTimer--;
+  const speedMult=slowmoTimer>0?0.3:1;
+  if (shakeTime>0) shakeTime--;
+  player.update();
+
+  if (!bossSpawned) {
+    spawnTimer++;
+    const dc = diffConfig[difficulty];
+    const sd = stageDefs[currentStage-1];
+    // 出怪间隔：Easy 3秒起步 → Lunatic 1秒起步
+    const spawnInterval = Math.max(dc.spawnIntervalMin, dc.spawnIntervalBase - gameTimer/dc.spawnIntervalDecay);
+    if (spawnTimer >= spawnInterval) {
+      spawnTimer = 0;
+      // 出怪数量：Easy 最多2只 → Lunatic 最多5只
+      const progress = Math.min(1, gameTimer / (dc.bossDelay * 60));
+      const n = Math.max(1, Math.min(dc.maxEnemies, Math.floor(1 + progress * dc.maxEnemies)));
+      for (let i = 0; i < n; i++) {
+        const ex = 30 + Math.random() * (W - 60);
+        const isBig = Math.random() < dc.bigEnemyChance * progress;
+        enemies.push(new Enemy(ex, -10, isBig ? 'big' : 'fairy', sd.enemyColor));
+      }
+    }
+    // Boss出现时间：Easy 80秒 → Lunatic 30秒
+    if (gameTimer > dc.bossDelay * 60) {
+      bossSpawned=true;
+      boss = new Boss(sd);
+      boss.enter();
+      enemies=[];
+    }
+  }
+
+  for (let i=playerBullets.length-1;i>=0;i--) {
+    const b=playerBullets[i]; b.update();
+    if (b.dead) { playerBullets.splice(i,1); continue; }
+    for (let e of enemies) { if(e.dead)continue; const dx=b.x-e.x,dy=b.y-e.y; if(Math.sqrt(dx*dx+dy*dy)<b.radius+e.radius){e.hp-=b.damage;b.dead=true;createParticle(b.x,b.y,'#ffffff',1);break;} }
+    if (boss&&boss.entered&&!boss.dead&&!b.dead) { const dx=b.x-boss.x,dy=b.y-boss.y; if(Math.sqrt(dx*dx+dy*dy)<b.radius+boss.radius){boss.hp-=b.damage;if(b.type!=='laser')b.dead=true;createParticle(b.x,b.y,'#ffffff',1);} }
+  }
+
+  for (let i=bullets.length-1;i>=0;i--) { bullets[i].update(); if(bullets[i].dead)bullets.splice(i,1); }
+  for (let i=enemies.length-1;i>=0;i--) { enemies[i].update(); if(enemies[i].dead)enemies.splice(i,1); }
+  if (boss&&!boss.dead) { for(let s=0;s<speedMult;s++) boss.update(); }
+  for (let i=items.length-1;i>=0;i--) { items[i].update(); if(items[i].dead)items.splice(i,1); }
+  // ═══ 碰撞检测：在所有实体更新之后执行，确保每个子弹都被检查 ═══
+  if (player && gameState==='playing') {
+    for (let i=bullets.length-1;i>=0;i--) {
+      const b = bullets[i];
+      const hitDist = player.radius + b.radius + 2;
+      const dx = b.x - player.x, dy = b.y - player.y;
+      if ((dx*dx + dy*dy) < hitDist*hitDist) {
+        // 无敌帧：子弹穿过但不受伤，显示黄色粒子提示
+        if (player.invincible > 0 || player.bombActive > 0) {
+          createParticle(b.x, b.y, '#ffff44', 2);
+          continue; // 不销毁子弹，继续飞行
+        }
+        // 正常命中
+        player.hit(15);
+        b.dead = true;
+        createParticle(b.x, b.y, '#ff3366', 3);
+      }
+    }
+    for (let i=bullets.length-1;i>=0;i--) { if(bullets[i].dead)bullets.splice(i,1); }
+  }
+  updateParticles();
+}
+
+function renderGame() {
+  g.save();
+  if (shakeTime>0) g.translate(Math.round((Math.random()-0.5)*3), Math.round((Math.random()-0.5)*3));
+  const sd = stageDefs[currentStage-1];
+  drawBG(sd.bg);
+  for (let it of items) it.draw();
+  for (let e of enemies) e.draw();
+  if (boss) boss.draw();
+  for (let b of playerBullets) b.draw();
+  for (let b of bullets) b.draw();
+  if (player) player.draw();
+  drawParticles();
+  g.restore();
+  drawHUD();
+}
+
+// ==================== 主循环 ====================
+let lastTime=0;
+function gameLoop(ts) {
+  lastTime=ts||lastTime;
+  if (gameState==='playing') updateGame();
+  if (gameState==='playing'||gameState==='paused') {
+    // 清除离屏画布
+    g.clearRect(0, 0, SW, SH);
+    renderGame();
+    if (gameState==='paused') {
+      g.fillStyle='rgba(0,0,0,0.5)'; g.fillRect(0,0,W,H);
+    }
+    // 将离屏画布 2x 放大到主画布
+    ctx.clearRect(0, 0, 480, 640);
+    ctx.drawImage(offCanvas, 0, 0, 480, 640);
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+// ==================== 界面控制 ====================
+function hideAll() {
+  ['titleScreen','charScreen','stageScreen','helpScreen','pauseScreen','resultScreen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+}
+
+function showTitle() { hideAll(); gameState='title'; document.getElementById('titleScreen').classList.remove('hidden'); updateTitleInfo(); }
+function showCharSelect() { hideAll(); document.getElementById('charScreen').classList.remove('hidden'); }
+function showHelp() { hideAll(); document.getElementById('helpScreen').classList.remove('hidden'); }
+
+function showStageSelect() {
+  hideAll();
+  document.getElementById('stageScreen').classList.remove('hidden');
+  const container = document.getElementById('stageBtns');
+  container.innerHTML = '';
+  stageDefs.forEach((s,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'stageBtn' + (i===0 ? ' selected' : '');
+    btn.dataset.stage = s.id;
+    btn.textContent = '第' + s.id + '关\n' + s.name;
+    btn.style.whiteSpace = 'pre-line';
+    btn.style.lineHeight = '1.5';
+    btn.onclick = () => selectStage(s.id);
+    container.appendChild(btn);
+  });
+  document.getElementById('stageCharInfo').textContent = currentChar==='marisa'?'雾雨魔理沙':'博丽灵梦';
+}
+
+function selectChar(c) {
+  currentChar=c;
+  document.querySelectorAll('.charCard').forEach(el=>el.classList.toggle('selected', el.dataset.char===c));
+  document.getElementById('stageCharInfo').textContent = c==='marisa'?'雾雨魔理沙':'博丽灵梦';
+}
+
+function selectDiff(d) { difficulty=d; document.querySelectorAll('.diffBtn').forEach(el=>el.classList.toggle('selected', el.dataset.diff===d)); }
+function selectStage(id) { currentStage=id; document.querySelectorAll('.stageBtn').forEach(el=>el.classList.toggle('selected', parseInt(el.dataset.stage)===id)); }
+
+function startSelectedStage() { hideAll(); startGameLogic(); gameState='playing'; }
+function pauseGame() { gameState='paused'; document.getElementById('pauseScreen').classList.remove('hidden'); }
+function resumeGame() { gameState='playing'; document.getElementById('pauseScreen').classList.add('hidden'); }
+function restartGame() { hideAll(); startGameLogic(); gameState='playing'; }
+function quitToTitle() { showTitle(); }
+
+function goNextStage() {
+  if (currentStage < stageDefs.length) {
+    currentStage++;
+    hideAll(); startGameLogic(); gameState='playing';
+  }
+}
+
+function gameOver(win) {
+  gameState='result';
+  const nextBtn = document.getElementById('nextStageBtn');
+  if (win && currentStage < stageDefs.length) {
+    nextBtn.style.display = '';
+    nextBtn.textContent = '下一关：第'+(currentStage+1)+'关「'+stageDefs[currentStage].name+'」';
+    if (currentStage >= highestUnlocked) highestUnlocked = currentStage + 1;
+  } else { nextBtn.style.display = 'none'; }
+  document.getElementById('resultTitle').textContent = win ? '🎉 关卡通关！' : 'Game Over';
+  document.getElementById('finalScore').textContent = score.toLocaleString();
+  document.getElementById('grazeCount').textContent = grazeCount;
+  document.getElementById('spellGet').textContent = spellGet + ' / ' + spellTotal;
+  document.getElementById('resultScreen').classList.remove('hidden');
+}
+
+function updateTitleInfo() {
+  const el = document.getElementById('titleInfo');
+  el.innerHTML = '当前角色：<b>'+(currentChar==='marisa'?'雾雨魔理沙':'博丽灵梦')+'</b> | 难度：<b>'+difficulty+'</b><br>方向键 移动 | Z 射击 | X 炸弹 | Shift 低速 | C 清屏';
+}
+
+// ==================== 启动 ====================
+initBG();
+drawCharAvatars();
+updateTitleInfo();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
