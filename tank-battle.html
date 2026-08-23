@@ -1104,18 +1104,254 @@
   }
   .keycap.wide { padding: 3px 14px; letter-spacing: 3px; }
 
-  /* ======= DECORATIONS / ACHIEVEMENTS ======= */
+  /* ======= 授 勋 仪 式 · 全 屏 CG 风 格 仪 式 面 板 ======= */
+  /* —— 面板根节点：强制全屏铺满（双重保险覆盖 .overlay 居中样式）—— */
+  #decorationsPanel {
+    position: fixed !important;
+    left: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    transform: none !important;
+    margin: 0 !important; padding: 0 !important;
+    z-index: 9999 !important;
+    overflow: hidden;
+  }
+  /* —— ① 大礼堂 CG 背景：红军幕布 + 暖金聚光 + 暗角 —— */
+  .deco-cg-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      /* 顶部金色聚光柱：从舞台穹顶倾泻而下 */
+      radial-gradient(ellipse 55% 70% at 50% 0%, rgba(255,215,140,0.30) 0%, rgba(255,196,110,0.10) 50%, rgba(0,0,0,0) 78%),
+      /* 中央聚光：聚焦于授勋台（台词+勋章区） */
+      radial-gradient(ellipse 72% 58% at 50% 62%, rgba(0,0,0,0) 0%, rgba(25,12,12,0.42) 72%, rgba(0,0,0,0.88) 100%),
+      /* 竖向褶皱红军幕布 */
+      repeating-linear-gradient(90deg,
+        rgba(90,14,14,0.96) 0px,  rgba(130,22,22,0.93) 18px, rgba(70,10,10,0.97) 36px,
+        rgba(108,18,18,0.94) 54px, rgba(78,12,12,0.96) 72px, rgba(140,24,24,0.91) 90px),
+      /* 底层深夜军营橄榄黑 */
+      linear-gradient(180deg, #1a0a0a 0%, #2a0f0f 40%, #190808 100%);
+    overflow: hidden;
+  }
+  /* —— 顶部八一大星 红金光晕圈 —— */
+  .deco-star-halo {
+    position: absolute;
+    top: 6%;  left: 50%;
+    transform: translateX(-50%);
+    width: 320px; height: 320px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(220,50,50,0.55) 0%, rgba(130,22,22,0.32) 55%, rgba(0,0,0,0) 72%),
+      radial-gradient(circle at 50% 50%, rgba(255,210,120,0.22) 0%, rgba(255,180,60,0.06) 60%, rgba(0,0,0,0) 80%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: deco-halo-pulse 3.6s ease-in-out infinite alternate;
+  }
+  @keyframes deco-halo-pulse {
+    from { opacity: 0.82; transform: translateX(-50%) scale(0.98); }
+    to   { opacity: 1.00; transform: translateX(-50%) scale(1.04); }
+  }
+  /* —— 中央金色八一大五角星 + 八一字样（SVG data URl，纯内联无外部依赖）—— */
+  .deco-star-emblem {
+    position: absolute;
+    top: calc(6% + 30px);  left: 50%;
+    transform: translateX(-50%);
+    width: 260px; height: 260px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><radialGradient id='decoG' cx='50%25' cy='45%25' r='55%25'><stop offset='0%25' stop-color='%23fff0b0'/><stop offset='55%25' stop-color='%23d4a84a'/><stop offset='100%25' stop-color='%238a6a28'/></radialGradient></defs><polygon points='100,18 123,78 188,78 135,116 156,180 100,142 44,180 65,116 12,78 77,78' fill='url(%23decoG)' stroke='%23fff1c8' stroke-width='2' stroke-linejoin='round' opacity='0.94'/><text x='100' y='118' text-anchor='middle' font-family='SimHei,Microsoft YaHei,sans-serif' font-weight='900' font-size='32' fill='%23b02020' stroke='%23fff1c8' stroke-width='1'>八一</text></svg>");
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+    filter: drop-shadow(0 0 36px rgba(255,200,100,0.55));
+    pointer-events: none;
+  }
+  /* —— ② 顶部典礼横幅 —— */
+  .deco-banner {
+    position: absolute; z-index: 2;
+    top: 28px; left: 50%; transform: translateX(-50%);
+    text-align: center;
+    width: 680px;
+  }
+  .deco-banner-title {
+    font-family: SimHei, "Microsoft YaHei", sans-serif;
+    font-size: 34px; font-weight: 900;
+    letter-spacing: 14px;
+    color: #fff1c8;
+    text-shadow:
+      0 0 14px rgba(255,200,100,0.55),
+      0 2px 0 rgba(120,20,20,0.6),
+      0 4px 12px rgba(0,0,0,0.8);
+    background: linear-gradient(180deg, #fff8d8 0%, #ffd870 55%, #c89a3a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+  }
+  .deco-banner-subtitle {
+    font-size: 14px; letter-spacing: 6px;
+    color: #e8d4a0; opacity: 0.92;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+  }
+  .deco-banner-divider {
+    margin: 12px auto 0;
+    width: 80%; height: 2px;
+    background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,200,100,0.8) 50%, rgba(0,0,0,0) 100%);
+  }
+  /* —— ③ 剧情台词区（礼堂通告风格）—— */
+  .deco-dialog {
+    position: absolute; z-index: 3;
+    left: 50%; transform: translateX(-50%);
+    top: 310px;                /* 从350上移40px，避免和底部小卡片重叠 */
+    width: 780px;              /* 稍微收窄，腾出横向空间 */
+    padding: 14px 22px 14px;   /* 内边距略缩 */
+    background: linear-gradient(180deg, rgba(28,14,14,0.92) 0%, rgba(18,9,9,0.96) 100%);
+    border: 1px solid rgba(255,200,100,0.42);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px rgba(168,148,102,0.15),
+      0 12px 40px rgba(0,0,0,0.75),
+      inset 0 0 28px rgba(120,20,20,0.18);
+    backdrop-filter: blur(4px);
+  }
+  /* L 型边角装饰 */
+  .deco-dialog::before, .deco-dialog::after {
+    content: ""; position: absolute;
+    width: 26px; height: 26px;
+    border: 2px solid #d4a84a;
+    opacity: 0.85;
+  }
+  .deco-dialog::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .deco-dialog::after  { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .deco-dialog-topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 8px; margin-bottom: 8px;
+    border-bottom: 1px dashed rgba(255,200,100,0.3);
+  }
+  .deco-dialog-tag {
+    font-size: 12px; letter-spacing: 4px;
+    color: #e04040;
+    background: rgba(224,64,64,0.08);
+    padding: 3px 12px;
+    border: 1px solid rgba(224,64,64,0.35);
+    border-radius: 2px;
+  }
+  .deco-dialog-pager {
+    font-size: 12px; letter-spacing: 2px;
+    color: rgba(255,200,100,0.7);
+    font-family: Consolas, monospace;
+  }
+  .deco-dialog-who {
+    font-size: 13px; letter-spacing: 3px;
+    color: #ffd870; font-weight: 700;
+    margin: 4px 0 10px;
+    padding-left: 8px;
+    border-left: 3px solid #d4a84a;
+  }
+  .deco-dialog-text {
+    font-size: 16px; line-height: 1.9;
+    letter-spacing: 1px;
+    color: #f0e6d0;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+    margin-bottom: 14px;
+  }
+  .deco-dialog-text b {
+    color: #ffd870; font-weight: 800;
+  }
+  .deco-dialog-buttons {
+    display: flex; justify-content: flex-end;
+  }
+  /* —— ④ 勋章展示区（超小紧凑版，贴最底部 · 避免遮挡对话框）—— */
+  .deco-ribbon-title {
+    position: absolute; z-index: 3;
+    left: 50%; transform: translateX(-50%);
+    bottom: 132px;            /* 卡片群正上方约 12px */
+    font-size: 11px; letter-spacing: 7px;
+    color: rgba(255,200,100,0.90);
+    text-shadow: 0 1px 5px rgba(0,0,0,0.9);
+  }
   .deco-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    position: absolute; z-index: 3;
+    left: 50%; transform: translateX(-50%);
+    bottom: 12px;             /* 紧贴最底部（贴屏幕下边缘） */
+    width: 760px;             /* 从860再收窄100 */
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px;                /* 从16再缩到12 */
   }
   .deco-card {
-    padding: 14px 16px; background: rgba(40,44,40,0.6);
-    border: 1px solid rgba(168,148,102,0.35); border-radius: 4px;
+    position: relative;
+    padding: 8px 10px 7px;    /* 极度压缩内边距 */
+    background: linear-gradient(180deg, rgba(40,20,20,0.90) 0%, rgba(22,11,11,0.96) 100%);
+    border: 1px solid rgba(255,200,100,0.42);
+    border-radius: 4px;
+    box-shadow:
+      0 4px 14px rgba(0,0,0,0.7),
+      inset 0 0 12px rgba(120,20,20,0.2),
+      0 0 10px rgba(255,200,100,0.10);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
-  .deco-card.locked { opacity: 0.5; filter: grayscale(0.8); }
-  .deco-card h3 { color: var(--gold); font-size: 15px; letter-spacing: 2px; margin-bottom: 4px; }
-  .deco-card p { color: var(--textMid); font-size: 12px; line-height: 1.7; }
-  .deco-card .deco-date { margin-top: 8px; color: var(--textLow); font-size: 11px; text-align: right; letter-spacing: 1px; }
+  .deco-card::before, .deco-card::after {
+    content: ""; position: absolute; width: 10px; height: 10px;
+    border: 1.2px solid #d4a84a; opacity: 0.9; pointer-events: none;
+  }
+  .deco-card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .deco-card::after  { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .deco-card.earned { animation: deco-card-in 0.6s ease both; }
+  .deco-card.locked  { opacity: 0.55; filter: grayscale(0.85); }
+  .deco-card.earned:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,220,140,0.85);
+    box-shadow:
+      0 8px 22px rgba(0,0,0,0.8),
+      inset 0 0 14px rgba(180,30,30,0.25),
+      0 0 18px rgba(255,210,120,0.25);
+  }
+  @keyframes deco-card-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .deco-ribbon {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 20px;           /* 从30px → 20px，极度缩小 */
+    line-height: 1;
+    margin: 0 6px 0 0;        /* 横向排布 + 勋章名并排 */
+    filter: drop-shadow(0 2px 5px rgba(255,200,100,0.35));
+  }
+  .deco-name {
+    display: inline-block;
+    vertical-align: middle;
+    font-family: SimHei, "Microsoft YaHei", sans-serif;
+    font-size: 12px;           /* 从13.5再缩 */
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #ffd870;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+    margin: 0;
+    padding: 0;
+    border: none;
+    max-width: calc(100% - 32px);
+  }
+  .deco-desc {
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: 0.2px;
+    color: #cfc9b5;
+    text-align: left;
+    margin-top: 5px;
+  }
+  .deco-status {
+    margin-top: 5px;
+    text-align: center;
+    font-size: 9.5px;
+    letter-spacing: 2.5px;
+    padding: 2px 0;
+    color: #8fb070;
+    border-top: 1px solid rgba(143,176,112,0.28);
+    border-bottom: 1px solid rgba(143,176,112,0.28);
+    background: rgba(107,142,90,0.08);
+  }
+  .deco-card.locked .deco-status {
+    color: #a04848;
+    border-color: rgba(160,72,72,0.3);
+    background: rgba(160,72,72,0.08);
+  }
+
+  /* ======= ACHIEVEMENTS (战绩勋章列表) ======= */
   .achievements-list {
     display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
     max-height: 520px; overflow-y: auto; padding-right: 8px;
@@ -1330,47 +1566,21 @@
   .cg-fullscreen-bg.defeat {
     background: radial-gradient(ellipse at 50% 45%, rgba(88,20,20,0.6) 0%, rgba(30,6,6,0.9) 55%, rgba(0,0,0,1) 100%);
   }
-  /* 授勋仪式 · 专属背景（胜利结局 图06 · 无真实CG时：军事礼堂风格） */
+  /* 授勋页：不使用任何专属背景/八一五角星（保持与其他页一致的CG风格） */
   .cg-fullscreen-bg.award-ceremony {
-    background:
-      /* 金色聚光：舞台顶部倾泻而下的暖金色光柱 */
-      radial-gradient(ellipse 60% 80% at 50% 0%, rgba(255,215,130,0.28) 0%, rgba(255,200,100,0.08) 45%, rgba(0,0,0,0) 75%),
-      /* 中央暗角聚光：聚焦于前方主席台位置 */
-      radial-gradient(ellipse 70% 55% at 50% 65%, rgba(0,0,0,0) 0%, rgba(20,10,10,0.35) 70%, rgba(0,0,0,0.85) 100%),
-      /* 深红军旗红幕布（竖向褶皱渐变） */
-      repeating-linear-gradient(90deg,
-        rgba(90,14,14,0.95) 0px, rgba(130,22,22,0.92) 16px, rgba(70,10,10,0.96) 32px,
-        rgba(110,18,18,0.93) 48px, rgba(80,12,12,0.95) 64px, rgba(140,24,24,0.90) 80px),
-      /* 底层：深夜军营橄榄黑 */
-      linear-gradient(180deg, #1a0a0a 0%, #2a0f0f 40%, #1a0a0a 100%);
+    /* 禁用所有专属装饰：无红色幕布、无聚光、无八一五星 */
+    background: none !important;
     position: absolute; inset: 0;
   }
-  /* 授勋 · 顶部八一红星徽章（居中，金色描边 + 半透明深红底） */
+  /* 完全隐藏顶部八一红星光晕圈 */
   .cg-fullscreen-bg.award-ceremony::before {
-    content: "";
-    position: absolute;
-    top: 12%; left: 50%;
-    transform: translateX(-50%);
-    width: 260px; height: 260px;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(200,40,40,0.55) 0%, rgba(120,20,20,0.35) 55%, rgba(0,0,0,0) 72%),
-      radial-gradient(circle at 50% 50%, rgba(255,210,120,0.18) 0%, rgba(255,180,60,0.05) 60%, rgba(0,0,0,0) 80%);
-    border-radius: 50%;
-    pointer-events: none;
+    display: none !important;
+    content: none !important;
   }
+  /* 完全隐藏金色八一字样 + 大五角星SVG */
   .cg-fullscreen-bg.award-ceremony::after {
-    /* 金色八一字样 + 大五角星（SVG data URI，无外部依赖） */
-    content: "";
-    position: absolute;
-    top: calc(12% + 28px); left: 50%;
-    transform: translateX(-50%);
-    width: 204px; height: 204px;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><radialGradient id='g' cx='50%25' cy='45%25' r='55%25'><stop offset='0%25' stop-color='%23ffe8a0'/><stop offset='55%25' stop-color='%23d4a84a'/><stop offset='100%25' stop-color='%238a6a28'/></radialGradient></defs><polygon points='100,18 123,78 188,78 135,116 156,180 100,142 44,180 65,116 12,78 77,78' fill='url(%23g)' stroke='%23fff1c8' stroke-width='2' stroke-linejoin='round' opacity='0.92'/><text x='100' y='118' text-anchor='middle' font-family='SimHei,Microsoft YaHei,sans-serif' font-weight='900' font-size='32' fill='%23c22' stroke='%23fff1c8' stroke-width='1'>八一</text></svg>");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: drop-shadow(0 0 28px rgba(255,200,100,0.45));
-    pointer-events: none;
+    display: none !important;
+    content: none !important;
   }
   .cg-placeholder {
     position: absolute; inset: 60px;
@@ -1614,11 +1824,6 @@
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; object-position: center;
     display: block; pointer-events: none;
-    animation: cg-fade 0.8s ease both;
-  }
-  @keyframes cg-fade {
-    from { opacity: 0; transform: scale(1.02); filter: blur(4px); }
-    to   { opacity: 1; transform: scale(1);    filter: blur(0); }
   }
   .cg-cinemask {
     position: absolute; inset: 0; pointer-events: none;
@@ -2106,12 +2311,46 @@
   </div>
 
   <!-- Promotions panel (授勋中心) -->
-  <div id="decorationsPanel" class="overlay glass-panel hidden" style="width:760px;padding:36px 44px 28px;">
-    <div class="ls-header" style="margin-bottom:16px;">
-      <h2>勋 奖 中 心 · 授 勋 记 录</h2>
-      <button class="cmd-btn" id="btnDecorationsClose" style="padding:10px 20px;font-size:13px;">返 回</button>
+  <!-- ============ 授勋仪式 · 全屏CG风格仪式面板 ============ -->
+  <!-- ★ position/transform/left/top 必须 !important 覆盖 .overlay 默认的居中样式 -->
+  <div id="decorationsPanel" class="overlay hidden"
+       style="position:fixed !important;
+              left:0 !important; top:0 !important; right:0 !important; bottom:0 !important;
+              width:100% !important; height:100% !important;
+              transform:none !important;
+              margin:0 !important; padding:0 !important;
+              z-index:9999;">
+    <!-- —— ① 八一红星大礼堂背景层（CG式背景，含幕布/聚光/八一大星）—— -->
+    <div class="deco-cg-bg">
+      <!-- 顶部八一大星光晕圈 -->
+      <div class="deco-star-halo"></div>
+      <!-- 中央金色八一大五角星 + 八一字样 -->
+      <div class="deco-star-emblem"></div>
     </div>
-    <div class="man-divider" style="margin-bottom:18px;"></div>
+    <!-- —— ② 顶部典礼横幅 —— -->
+    <div class="deco-banner">
+      <div class="deco-banner-title" id="decoCeremonyTitle">授 勋 仪 式</div>
+      <div class="deco-banner-subtitle" id="decoCeremonySubtitle">共和 217 · 北境保卫战胜利纪念</div>
+      <div class="deco-banner-divider"></div>
+    </div>
+    <!-- —— ③ 中间剧情台词区（对话框风格）—— -->
+    <div class="deco-dialog">
+      <div class="deco-dialog-topbar">
+        <span class="deco-dialog-tag">典 礼 通 告</span>
+        <span class="deco-dialog-pager">1 / 1</span>
+      </div>
+      <div class="deco-dialog-who" id="decoCeremonyWho">授勋军官（第 37 装甲旅政委 · 少将）</div>
+      <div class="deco-dialog-text" id="decoCeremonyText">
+        兹授予：<br/>
+        <b>边境卫士勋章</b> · <b>铁锤营荣誉列兵</b>称号 · <b>首都保卫奖章</b>。<br/>
+        愿你永远记得这片土地上，曾有人挡在你前面。
+      </div>
+      <div class="deco-dialog-buttons">
+        <button class="cmd-btn" id="btnDecorationsClose" style="padding:12px 28px;font-size:14px;">返 回 主 菜 单</button>
+      </div>
+    </div>
+    <!-- —— ④ 勋章展示区（三张卡片）—— -->
+    <div class="deco-ribbon-title">— 荣 誉 授 予 —</div>
     <div class="deco-grid" id="decoGrid"></div>
   </div>
 
@@ -2246,10 +2485,11 @@
       </div>
       <div class="cg-dialog-actor" id="edVictoryDlgActor">— —</div>
       <div class="cg-dialog-body" id="edVictoryDlgBody">—</div>
-      <!-- 按钮栏：全部在对话框内 -->
+      <!-- 按钮栏：全部在对话框内。前页显示下一页；末页显示授勋仪式按钮 -->
       <div class="cg-dialog-buttons">
         <button class="cmd-btn" id="btnEndVictorySkip">跳 过 结 局</button>
         <button class="cmd-btn primary" id="btnEndVictoryNext">下 一 页</button>
+        <button class="cmd-btn primary gold" id="btnEndVictoryAward" style="display:none;">前 往 授 勋 仪 式</button>
       </div>
       <!-- L形金色角标 -->
       <span class="cg-dlg-corner tl"></span>
@@ -2923,14 +3163,31 @@ function renderAchievements() {
 }
 function renderDecorations() {
   const grid = document.getElementById('decoGrid');
+  const award = STORY.endingsVictory.awardCeremony;
+  // ——★ 装载授勋剧情台词到CG风格面板各元素 ——
+  const elTitle    = document.getElementById('decoCeremonyTitle');
+  const elSubtitle = document.getElementById('decoCeremonySubtitle');
+  const elWho      = document.getElementById('decoCeremonyWho');
+  const elText     = document.getElementById('decoCeremonyText');
+  if (elTitle)    elTitle.textContent    = award.title    || '授 勋 仪 式';
+  if (elSubtitle) elSubtitle.textContent = award.subtitle || '';
+  if (elWho)      elWho.textContent      = award.who      || '';
+  if (elText) {
+    // 把 text 中的换行转为 <br/>，保留 <b> 加粗
+    const html = (award.text || '').split('\n').map(l => l).join('<br/>');
+    elText.innerHTML = html;
+  }
+  // —— 渲染勋章卡片 ——
   if (!grid) return;
   grid.innerHTML = '';
-  const decorations = STORY.endingsVictory.awardCeremony.decorations;
+  const decorations = award.decorations;
   const hasSeenVictory = progress.endings && progress.endings.victory;
   decorations.forEach((d, i) => {
     const earned = hasSeenVictory;
     const el = document.createElement('div');
     el.className = 'deco-card' + (earned ? ' earned' : ' locked');
+    // 依次错峰出现动画
+    if (earned) el.style.animationDelay = (i * 0.18) + 's';
     el.innerHTML = `
       <div class="deco-ribbon">${earned ? '🎖️' : '🔒'}</div>
       <div class="deco-name">${d.name}</div>
@@ -3260,12 +3517,18 @@ function _edVictoryRenderSubChunk(pages, idx, subIdx, chunks, hasImg) {
   const subCount = Math.max(1, chunks ? chunks.length : 1);
   const subBadge = subCount > 1 ? ` <span class="cg-dialog-subpager">续 ${subIdx+1}/${subCount}</span>` : '';
   if (dPager) dPager.innerHTML = `${idx+1} / ${pages.length}${subBadge}`;
-  // 按钮文字/终态判断
-  const btnNext = document.getElementById('btnEndVictoryNext');
-  const isLastPage = (idx >= pages.length - 1);
-  const isLastSub = (subIdx >= subCount - 1);
-  const allDone = isLastPage && isLastSub;
-  if (btnNext) btnNext.textContent = allDone ? '查 看 勋 章' : '下 一 页';
+  // —— 按钮显隐：只有在【最后逻辑页 AND 最后子页】时才显示 前往授勋仪式，其余显示 下一页 ——
+  const btnNext  = document.getElementById('btnEndVictoryNext');
+  const btnAward = document.getElementById('btnEndVictoryAward');
+  // ——★ 按钮显示时机：3/4（倒数第二页）的最后子页就显示「前往授勋仪式」
+  //   不再需要翻到 4/4（授勋CG页），点按钮直接进入授勋仪式界面
+  //   兜底：若用户已进入4/4最后子页也仍然显示
+  const triggerOnPage  = (idx === pages.length - 2); // 3/4（倒数第二页，idx=2）
+  const fallbackOnLast = (idx >= pages.length - 1);  // 4/4（兜底兼容）
+  const isLastSub      = (subIdx >= subCount - 1);
+  const showAwardBtn   = (triggerOnPage || fallbackOnLast) && isLastSub;
+  if (btnNext)  btnNext.style.display  = showAwardBtn ? 'none' : '';
+  if (btnAward) btnAward.style.display = showAwardBtn ? ''     : 'none';
 }
 // 胜利结局：翻下一页（自动处理子页 → 逻辑页）
 function _edVictoryNext() {
@@ -3277,14 +3540,9 @@ function _edVictoryNext() {
     _edVictorySwitchBG(_edVictoryIdx, _edVictorySubIdx + 1);
     return;
   }
-  if (_edVictoryIdx >= pages.length - 1) {
-    // 终页终子页 → 进入授勋
-    const cb = _edVictoryOnDone;
-    _edVictoryOnDone = null;
-    document.getElementById('endingVictoryCG').classList.add('hidden');
-    document.getElementById('endingVictoryCG').classList.remove('active');
-    if (typeof cb === 'function') cb();
-    else openDecorations();
+  // ——★ 防御：若当前已是 3/4（倒数第二页）最后子页，Next按钮本应已隐藏
+  //   极端情况（键盘快捷键绕过）走到这里时不再翻去 4/4，直接停住交给Award按钮
+  if (_edVictoryIdx >= pages.length - 2) {
     return;
   }
   // 下一逻辑页，子页从 0 开始
@@ -3396,6 +3654,11 @@ function startEndingVictoryCG(onDone) {
   _edVictorySubIdx = 0;
   _edVictorySubCache = {}; // 重开需清空缓存（浏览器尺寸可能变）
   hideAllOverlays();
+  // —— 启动时初始化按钮显隐：默认显示下一页，隐藏授勋按钮（防上次残留）——
+  const btnNext  = document.getElementById('btnEndVictoryNext');
+  const btnAward = document.getElementById('btnEndVictoryAward');
+  if (btnNext)  btnNext.style.display  = '';
+  if (btnAward) btnAward.style.display = 'none';
   const ov = document.getElementById('endingVictoryCG');
   ov.classList.remove('hidden'); ov.classList.add('active');
   _edVictorySwitchBG(0, 0);
@@ -3686,6 +3949,52 @@ window.addEventListener('keydown', (e) => {
     if (e.key === '1' || e.key.toLowerCase() === 'q') tryCastSkill('q');
     if (e.key === '2' || e.key.toLowerCase() === 'e') tryCastSkill('e');
     if (e.key === '3' || e.key.toLowerCase() === 'r') tryCastSkill('r');
+  }
+  // ===== 开发测试快捷键（结局一） =====
+  if (e.key === 'F7') {
+    e.preventDefault();
+    // F7 = 直接进入结局一 CG
+    startEndingVictoryCG(() => { openDecorations(); });
+  }
+  if (e.key === 'F8') {
+    e.preventDefault();
+    // F8 = 跳到结局一 3/4（倒数第二页）最后子页 → 直接显示「前往授勋仪式」按钮
+    const ov = document.getElementById('endingVictoryCG');
+    const pages = STORY.endingsVictory.pages;
+    const triggerIdx = pages.length - 2; // 倒数第二页（3/4，idx=2）
+    const jumpToLast = () => {
+      _edVictoryIdx = triggerIdx;
+      _edVictorySubIdx = 9999; // 超大值，_edVictorySwitchBG 内部会 clamp 到最后子页
+      _edVictorySwitchBG(triggerIdx, 9999);
+    };
+    if (ov.classList.contains('hidden')) {
+      // 结局层未打开：先启动结局CG，等待首帧后跳 3/4 末子页
+      hideAllOverlays();
+      const btnNext  = document.getElementById('btnEndVictoryNext');
+      const btnAward = document.getElementById('btnEndVictoryAward');
+      if (btnNext)  btnNext.style.display  = '';
+      if (btnAward) btnAward.style.display = 'none';
+      ov.classList.remove('hidden'); ov.classList.add('active');
+      _edVictoryOnDone = () => { openDecorations(); };
+      _edVictorySubCache = {};
+      _edVictoryIdx = 0; _edVictorySubIdx = 0;
+      _edVictorySwitchBG(0, 0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { jumpToLast(); });
+      });
+    } else {
+      // 结局层已打开：直接跳 3/4 末子页
+      jumpToLast();
+    }
+  }
+  // F9 = 直接打开「授勋仪式」面板（测试用）
+  if (e.key === 'F9') {
+    e.preventDefault();
+    // 确保进度标记为已通关 → 勋章显示"已授予"
+    if (!progress.endings) progress.endings = {};
+    progress.endings.victory = true;
+    saveProgress();
+    openDecorations();
   }
 }, { passive: false });
 window.addEventListener('keyup', (e) => {
@@ -7114,7 +7423,18 @@ function bindUI() {
   const eVNext = document.getElementById('btnEndVictoryNext');
   if (eVNext) eVNext.addEventListener('click', () => {
     Audio.click();
-    _edVictoryNext();   // ★ 使用新版自动子页推进（自动处理 子页 → 逻辑页 → 授勋）
+    _edVictoryNext();   // ★ 使用新版自动子页推进（自动处理 子页 → 逻辑页）
+  });
+  // ★ 胜利结局：前往授勋仪式按钮（终页终子页才显示）
+  const eVAward = document.getElementById('btnEndVictoryAward');
+  if (eVAward) eVAward.addEventListener('click', () => {
+    Audio.click();
+    const cb = _edVictoryOnDone;
+    _edVictoryOnDone = null;
+    document.getElementById('endingVictoryCG').classList.add('hidden');
+    document.getElementById('endingVictoryCG').classList.remove('active');
+    if (typeof cb === 'function') cb();
+    else openDecorations();
   });
   const eVSkip = document.getElementById('btnEndVictorySkip');
   if (eVSkip) eVSkip.addEventListener('click', () => {
