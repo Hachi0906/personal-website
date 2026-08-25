@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%23e8702a' d='M256 256L128 256L0 128L128 128ZM256 128L128 128L0 0L128 0Z'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hachi · 岩层之下，岁月成书</title>
+    <!-- 地质主题背景：深色渐变 + 细颗粒噪点（纯 CSS，无外部资源） -->
+    <style>
+      :root {
+        --bg-0: #0a0e12;
+        --bg-1: #16201b;
+        --bg-2: #1d2a24;
+        --orange: #e8702a;
+        --orange-2: #ffb988;
+        --olive: #6b8e5a;
+        --gold: #a89466;
+        --text: #f3efe4;
+        --muted: rgba(243, 239, 228, 0.7);
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.14);
+      }
+
+      * { box-sizing: border-box; }
+      html, body, #root { height: 100%; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(1200px 700px at 80% -10%, rgba(232,112,42,0.18), transparent 60%),
+          radial-gradient(1000px 600px at -10% 110%, rgba(107,142,90,0.22), transparent 60%),
+          linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-2) 100%);
+        color: var(--text);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ========== Fallback 提示卡片（file:// 打开时显示） ========== */
+      .fallback {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 32px 20px;
+      }
+      .fallback-card {
+        width: 100%;
+        max-width: 720px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-radius: 28px;
+        padding: 40px 36px 36px;
+        box-shadow: 0 30px 80px -20px rgba(0,0,0,0.55);
+      }
+      .chapter {
+        display: inline-block;
+        font-size: 12px;
+        letter-spacing: 0.28em;
+        color: var(--orange);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+      }
+      .fallback-title {
+        font-size: clamp(28px, 4.4vw, 44px);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        margin-bottom: 16px;
+      }
+      .fallback-title .accent {
+        background: linear-gradient(90deg, var(--orange-2), var(--orange));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-style: italic;
+        font-family: 'Playfair Display', 'Times New Roman', serif;
+      }
+      .fallback-desc {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.85;
+        max-width: 620px;
+        margin-bottom: 26px;
+      }
+      .fallback-desc code {
+        background: rgba(232,112,42,0.12);
+        color: var(--orange-2);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        border: 1px solid rgba(232,112,42,0.22);
+      }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+      .dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: var(--orange);
+        box-shadow: 0 0 0 4px rgba(232,112,42,0.18);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.35); opacity: 0.7; }
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 14px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+      }
+      .btn-primary {
+        background: var(--orange);
+        color: #fff;
+        box-shadow: 0 16px 34px -12px rgba(232,112,42,0.55);
+      }
+      .btn-primary:hover { background: #d5601f; transform: translateY(-1px); }
+      .btn-ghost {
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+        border-color: var(--border);
+      }
+      .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+      .steps {
+        margin-top: 8px;
+        padding: 20px 22px;
+        border-radius: 18px;
+        border: 1px dashed rgba(168,148,102,0.35);
+        background: rgba(168,148,102,0.05);
+      }
+      .steps-title {
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 14px;
+        align-items: start;
+        margin-top: 10px;
+      }
+      .step-num {
+        width: 28px; height: 28px; border-radius: 9px;
+        background: rgba(107,142,90,0.16);
+        color: #c9ddb0;
+        display: grid; place-items: center;
+        font-weight: 700; font-size: 13px;
+        border: 1px solid rgba(107,142,90,0.35);
+      }
+      .step p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+      .step code {
+        background: rgba(255,255,255,0.06);
+        color: #ffe7c9;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12.5px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .tip {
+        margin-top: 22px;
+        font-size: 12.5px;
+        color: rgba(243,239,228,0.55);
+        line-height: 1.8;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Fallback 容器：当检测到 file:// 协议 / CORS / 脚本加载失败时显示 -->
+    <div id="fallback" class="fallback" style="display:none;">
+      <div class="fallback-card">
+        <span class="chapter">Chapter · Guide</span>
+        <h1 class="fallback-title">
+          请通过 <span class="accent">本地服务器</span> 访问网站
+        </h1>
+        <p class="fallback-desc">
+          这是一个 <code>Vite + React + TypeScript</code> 项目，入口脚本是
+          ES 模块，<strong>不能直接用浏览器双击 HTML 打开（file:// 协议）</strong>。
+          请启动开发服务器，然后访问下方链接。
+        </p>
+
+        <div id="status-line" class="status">
+          <span class="dot"></span>
+          <span id="status-text">正在尝试自动跳转到本地开发服务器…</span>
+        </div>
+
+        <div class="actions">
+          <a id="open-dev" class="btn btn-primary" href="http://localhost:5175/index.vite.html">
+            打开开发服务器 →
+          </a>
+          <button id="retry" class="btn btn-ghost" type="button" onclick="tryRedirect(true)">
+            重试自动跳转
+          </button>
+          <a
+            class="btn btn-ghost"
+            href="https://cn.vitejs.dev/guide/"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            查看 Vite 文档
+          </a>
+        </div>
+
+        <div class="steps">
+          <div class="steps-title">3 步启动本项目</div>
+
+          <div class="step">
+            <div class="step-num">1</div>
+            <p>
+              在项目根目录（<code>d:\TRAE\坦克大作战</code>）打开 PowerShell
+              / CMD / 终端。
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <p>
+              安装依赖（已装过可跳过）：<code>npm install</code><br/>
+              然后启动开发服务器：<code>npx vite --port 5175</code>
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <p>
+              终端会输出地址，点击或复制到浏览器：
+              <code>http://localhost:5175/index.vite.html</code>
+            </p>
+          </div>
+        </div>
+
+        <p class="tip">
+          若你的端口被占用，把 <code>5175</code> 换成实际 Vite 输出的端口即可；
+          路由使用 <code>#/xxx</code> 格式，比如 <code>#/skills</code> 可直达「个人技能」页。
+        </p>
+      </div>
+    </div>
+
+    <!-- React 挂载根 -->
+    <div id="root"></div>
+
+    <script>
+      // 提前判断：file:// 协议直接 fallback（连 /src/main.tsx 都不会加载成功）
+      var isFileProtocol = window.location.protocol === 'file:';
+      var fallbackEl = document.getElementById('fallback');
+      var statusText = document.getElementById('status-text');
+      var openBtn = document.getElementById('open-dev');
+      var CANDIDATE_PORTS = [5175, 5174, 5173, 5176, 5177];
+
+      function showFallback(msg) {
+        fallbackEl.style.display = 'grid';
+        document.getElementById('root').style.display = 'none';
+        if (msg) statusText.textContent = msg;
+      }
+
+      // ========== 静默端口探测：fetch + mode=no-cors，死端口不刷 Console 红错 ==========
+      function probePorts(onFound, onAllDone) {
+        var done = false;
+        var finished = 0;
+        var TIMEOUT_MS = 1800;
+        CANDIDATE_PORTS.forEach(function (port) {
+          var finishedThis = false;
+          function finishOne(status) {
+            if (finishedThis) return;
+            finishedThis = true;
+            finished += 1;
+            if (status === 'ok' && !done) {
+              done = true;
+              if (onFound) onFound(port);
+            }
+            if (finished === CANDIDATE_PORTS.length && !done && onAllDone) onAllDone();
+          }
+          try {
+            var ctrl = null;
+            if (typeof AbortController !== 'undefined') {
+              ctrl = new AbortController();
+              setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
+            } else {
+              setTimeout(function () { finishOne('timeout'); }, TIMEOUT_MS);
+            }
+            var url = 'http://localhost:' + port + '/favicon.ico?t=' + Date.now() + '&p=' + port;
+            fetch(url, {
+              method: 'GET',
+              mode: 'no-cors',
+              cache: 'no-store',
+              credentials: 'omit',
+              redirect: 'follow',
+              signal: ctrl ? ctrl.signal : undefined,
+            }).then(function () { finishOne('ok'); }).catch(function () { finishOne('dead'); });
+          } catch (e) {
+            finishOne('dead');
+          }
+        });
+      }
+
+      function tryRedirect(manual) {
+        statusText.textContent = manual
+          ? '重新扫描 5173-5177 端口…'
+          : '正在尝试自动跳转到本地开发服务器…';
+        probePorts(
+          function (port) {
+            var target = 'http://localhost:' + port + '/index.vite.html' + window.location.hash;
+            statusText.textContent = '已检测到开发服务器（端口 ' + port + '），正在跳转…';
+            if (openBtn) openBtn.href = target;
+            setTimeout(function () { window.location.href = target; }, 60);
+          },
+          function () {
+            showFallback(
+              manual
+                ? '未检测到开发服务器，请在终端运行 npx vite，然后点击上方按钮。'
+                : '未检测到本地开发服务器，请按下方 3 步启动后再访问。'
+            );
+          }
+        );
+      }
+
+      if (isFileProtocol) {
+        showFallback('检测到你使用 file:// 直接打开，需要启动本地开发服务器。');
+        // 先静默 probe 一次，把「打开开发服务器」按钮的 href 提前指到活端口
+        try {
+          probePorts(function (port) {
+            var t = 'http://localhost:' + port + '/index.vite.html' + window.location.hash;
+            if (openBtn) openBtn.href = t;
+          }, function () {});
+          tryRedirect(false);
+        } catch (e) { /* 忽略 */ }
+      }
+    </script>
+
+    <!-- 仅在 HTTP(S) 模式下加载 React 入口 module，避免 file:// 下的报错噪音 -->
+    <script>
+      if (!isFileProtocol) {
+        var s = document.createElement('script');
+        s.type = 'module';
+        s.src = '/src/main.tsx';
+        // 如果 main.tsx 没加载成功（比如服务端没跑），再 fallback 提示
+        s.onerror = function () {
+          showFallback('脚本加载失败，请确认 Vite 开发服务器已启动。');
+        };
+        document.head.appendChild(s);
+      }
+    </script>
+  </body>
+</html>

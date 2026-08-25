@@ -3,26 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: {
-        brand: {
-          dark: "#2d3a2e",
-          green: "#3d5a3e",
-          light: "#f5f3ef",
-          cream: "#faf8f5",
-        },
-      },
       fontFamily: {
-        "helvetica-neue": [
-          "Helvetica Neue Light",
-          "Helvetica",
-          "Arial",
-          "sans-serif",
-        ],
-        playfair: ['"Playfair Display"', "serif"],
-        oswald: ['"Oswald"', "sans-serif"],
-        montserrat: ['"Montserrat"', "sans-serif"],
-        "roboto-slab": ['"Roboto Slab"', "serif"],
-        raleway: ['"Raleway"', "sans-serif"],
+        sans: ['"Inter"', 'sans-serif'],
+        playfair: ['"Playfair Display"', 'serif'],
       },
     },
   },

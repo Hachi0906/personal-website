@@ -1,1237 +1,302 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>马畅 · 个人简历</title>
-<style>
-/* ===== Reset & Base ===== */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
-  line-height:1.65;-webkit-font-smoothing:antialiased;
-  transition:background-color .3s ease,color .3s ease;
-  overflow-x:hidden;
-}
-a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-ul,ol{list-style:none}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hachi · 作品集入口</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%23e8702a' d='M256 256L128 256L0 128L128 128ZM256 128L128 128L0 0L128 0Z'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg-0: #0a0e12; --bg-1: #16201b; --bg-2: #1d2a24;
+      --orange: #e8702a; --orange-2: #ffb988; --olive: #6b8e5a;
+      --gold: #a89466; --text: #f3efe4;
+      --muted: rgba(243,239,228,0.72);
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.14);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1200px 700px at 80% -10%, rgba(232,112,42,0.18), transparent 60%),
+        radial-gradient(1000px 600px at -10% 110%, rgba(107,142,90,0.22), transparent 60%),
+        linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-2) 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+        'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: grid; place-items: center; padding: 32px 20px;
+    }
+    .card {
+      width: 100%; max-width: 760px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 28px;
+      padding: 40px 36px 36px;
+      box-shadow: 0 30px 80px -20px rgba(0,0,0,0.55);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .brand mark {
+      display: inline-block;
+      font-family: 'Playfair Display', 'Times New Roman', serif;
+      font-style: italic;
+      font-size: 30px;
+      letter-spacing: -0.01em;
+      background: linear-gradient(90deg, var(--orange-2), var(--orange));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      padding: 0;
+    }
+    .chapter {
+      display: inline-block; font-size: 12px; letter-spacing: 0.28em;
+      color: var(--orange); font-weight: 600; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin: 0 0 16px;
+    }
+    h1 .accent {
+      background: linear-gradient(90deg, var(--orange-2), var(--orange));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-style: italic;
+      font-family: 'Playfair Display', 'Times New Roman', serif;
+    }
+    p { color: var(--muted); font-size: 14.5px; line-height: 1.85; margin: 0 0 22px; }
+    p code, li code {
+      background: rgba(232,112,42,0.12); color: var(--orange-2);
+      padding: 2px 8px; border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+      border: 1px solid rgba(232,112,42,0.22);
+    }
+    .status {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+      font-size: 13px; color: var(--muted);
+    }
+    .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 4px rgba(232,112,42,0.18);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50%     { transform: scale(1.35); opacity: 0.7; }
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 20px; border-radius: 999px;
+      font-weight: 600; font-size: 14px;
+      border: 1px solid transparent;
+      cursor: pointer; transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--orange); color: #fff;
+      box-shadow: 0 16px 34px -12px rgba(232,112,42,0.55);
+    }
+    .btn-primary:hover { background: #d5601f; transform: translateY(-1px); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.06); color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
 
-/* ===== Theme Variables · 星空宇宙（融合 SpaceX 纯黑 + Raycast 黑曜石 + Stripe 漩涡星云） ===== */
-:root{
-  /* SpaceX 纯黑深空为底，经典星空蓝为主色（纯蓝不偏紫），极细冰蓝边 */
-  --primary:#2563eb;           /* 太空深蓝 — 主色（经典星空蓝，沉稳不偏紫） */
-  --primary-soft:#93c5fd;      /* 星尘柔蓝 — 柔色 */
-  --accent-cyan:#60a5fa;       /* 星环冰蓝 — 点缀 */
-  --accent-steel:#bfdbfe;      /* 星尘钢蓝 — 最浅 */
-  /* SpaceX 太空画布三梯度：近纯黑 → 黑曜石蓝黑 → 深空微蓝（极端克制，突出"空"） */
-  --bg-gradient-1:#000006;     /* 宇宙真空（近纯黑 + 1 蓝紫像素波长） */
-  --bg-gradient-2:#070816;     /* 黑曜石深空（Raycast #07080a 的宇宙版） */
-  --bg-gradient-3:#0e0f27;     /* 远星背景微蓝紫（Stripe 漩涡的底层） */
-  /* Raycast 黑曜石玻璃：极暗半透 + 极细冰蓝边 */
-  --card-bg:rgba(255,255,255,0.022);
-  --card-border:rgba(240,240,250,0.07);
-  --card-hover-border:rgba(200,210,255,0.22);
-  /* SpaceX 星光文字分层：光谱近白 → 冷灰 → 星尘灰紫（非纯白，带 1‰ 蓝紫波长） */
-  --text-primary:#f0f0fa;
-  --text-secondary:#b5b8d4;
-  --text-muted:#6a6c8a;
-  /* 阴影：Raycast 黑曜石表壳（内发高光 + 外沉阴影 + 外环） */
-  --shadow-soft:inset 0 1px 0 rgba(240,240,250,0.055),
-                0 10px 40px rgba(0,0,0,0.50),
-                0 0 0 1px rgba(240,240,250,0.04);
-  --shadow-glow:0 0 44px rgba(37,99,235,0.28);
-  --grid-line:rgba(240,240,250,0.02);
-  /* 形状 */
-  --radius-md:14px;
-  --radius-lg:20px;
-  --nav-h:72px;
-}
-/* ===== 星空宇宙背景 · SpaceX 纯黑深空 + Stripe 漩涡银河盘 + 多层密星 ===== */
-body{
-  min-height:100vh;
-  background:
-    /* (最上) 漩涡星云 Ⅰ：左下 → 右上斜铺 靛青紫漩涡（Stripe 渐变网格宇宙版 · 极淡 18%） */
-    radial-gradient(ellipse 90% 50% at -10% 90%, rgba(139,92,246,0.18) 0%, transparent 60%),
-    /* 漩涡星云 Ⅱ：右上方向的 星靛蓝+极光青 混融（Stripe 靛青蓝漩涡 · 22%） */
-    radial-gradient(ellipse 75% 55% at 108% 5%, rgba(37,99,235,0.22) 0%, rgba(96,165,250,0.10) 40%, transparent 65%),
-    /* 漩涡星云 Ⅲ：右下角 冷蓝星尘雾（极淡 12%，平衡画面） */
-    radial-gradient(ellipse 50% 40% at 92% 86%, rgba(191,219,254,0.12) 0%, transparent 62%),
-    /* (最下) SpaceX 太空纯黑三层线性打底 */
-    linear-gradient(180deg,var(--bg-gradient-1) 0%, var(--bg-gradient-2) 55%, var(--bg-gradient-3) 100%);
-  background-attachment:fixed;
-  color:var(--text-primary);
-  position:relative;
-  overflow-x:hidden;
-}
-/* 银河盘斜带（长椭圆，从左上→右下横跨）：仿 NASA 银河系可视化 */
-.galaxy-band{
-  position:fixed;inset:-10% -5% auto -5%;
-  height:60%;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 90% 26% at 50% 50%,
-      rgba(180,200,255,0.20) 0%,
-      rgba(139,92,246,0.12) 22%,
-      rgba(37,99,235,0.10) 40%,
-      rgba(96,165,250,0.06) 58%,
-      rgba(191,219,254,0.04) 72%,
-      transparent 100%
-    );
-  filter:blur(40px);
-  transform:rotate(-8deg) translateY(-25%);
-  mix-blend-mode:screen;
-  animation:galaxyDrift 80s linear infinite;
-}
-@keyframes galaxyDrift{
-  0%  { transform:rotate(-8deg) translateY(-25%) translateX(0); }
-  50% { transform:rotate(-8deg) translateY(-22%) translateX(40px); }
-  100%{ transform:rotate(-8deg) translateY(-25%) translateX(0); }
-}
-
-/* 星层 1 · 超远星（< 1px 的"星尘"，百万星点的错觉 · 密度最高） */
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:
-    /* 第1层：冷白远星 0.6px（超远 · 不闪烁） */
-    radial-gradient(0.6px 0.6px at 30px 20px, rgba(240,240,250,0.8), transparent),
-    radial-gradient(0.6px 0.6px at 70px 50px, rgba(240,240,250,0.7), transparent),
-    radial-gradient(0.6px 0.6px at 110px 90px, rgba(210,220,255,0.65), transparent),
-    radial-gradient(0.6px 0.6px at 150px 130px, rgba(240,240,250,0.72), transparent),
-    radial-gradient(0.6px 0.6px at 190px 40px, rgba(240,240,250,0.68), transparent),
-    radial-gradient(0.6px 0.6px at 230px 170px, rgba(220,230,255,0.6), transparent),
-    radial-gradient(0.6px 0.6px at 270px 210px, rgba(240,240,250,0.78), transparent),
-    radial-gradient(0.6px 0.6px at 310px 110px, rgba(240,240,250,0.66), transparent),
-    radial-gradient(0.6px 0.6px at 350px 250px, rgba(200,210,255,0.62), transparent),
-    /* 第2层：中远星 1px（冷白 + 少量彩星） */
-    radial-gradient(circle 1px at 50px 300px, rgba(240,240,250,0.88), transparent),
-    radial-gradient(circle 1px at 90px 60px, #e0e7ff, transparent),
-    radial-gradient(circle 1px at 170px 340px, rgba(167,243,208,0.78), transparent),
-    radial-gradient(circle 1px at 210px 90px, #c7d2fe, transparent),
-    radial-gradient(circle 1px at 290px 380px, rgba(240,240,250,0.92), transparent),
-    radial-gradient(circle 1px at 370px 190px, #a5f3fc, transparent),
-    radial-gradient(circle 1px at 30px 420px, rgba(240,240,250,0.78), transparent);
-  background-size:400px 460px;
-  background-repeat:repeat;
-  animation:starfieldBreath 9s ease-in-out -1s infinite alternate;
-}
-/* 星层 2 · 中近星（1.4~2px · 独立慢闪烁周期 · 含 Raycast 少量彩星点缀） */
-body::after{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:
-    radial-gradient(circle 1.4px at 140px 70px, rgba(240,240,250,0.95), transparent),
-    radial-gradient(circle 1.4px at 340px 260px, #c7d2fe, transparent),
-    radial-gradient(circle 1.4px at 60px 390px, rgba(240,240,250,0.92), transparent),
-    radial-gradient(circle 1.4px at 250px 30px, #a5f3fc, transparent),
-    radial-gradient(circle 1.4px at 390px 440px, rgba(240,240,250,0.90), transparent),
-    /* 大亮星 2px（恒星感 · 5% 密度） */
-    radial-gradient(circle 2px at 200px 200px, #ffffff, transparent),
-    radial-gradient(circle 2px at 80px 460px, rgba(240,240,250,0.98), transparent);
-  background-size:480px 520px;
-  background-repeat:repeat;
-  opacity:.86;
-  animation:twinkle 7s ease-in-out -3s infinite alternate;
-  mask-image:radial-gradient(ellipse at 50% 40%, black 15%, transparent 96%);
-  -webkit-mask-image:radial-gradient(ellipse at 50% 40%, black 15%, transparent 96%);
-}
-@keyframes starfieldBreath{
-  0%  { opacity:.72; }
-  50% { opacity:1; }
-  100%{ opacity:.78; }
-}
-@keyframes twinkle{
-  0%   { opacity:.60; transform:translateZ(0); }
-  50%  { opacity:.96; }
-  100% { opacity:.70; }
-}
-
-/* ===== 流星划过（稀疏简洁版 · 5颗 · 右上→左下斜穿） ===== */
-.meteor{
-  position:fixed;z-index:0;pointer-events:none;
-  width:2px;height:80px;
-  background:linear-gradient(180deg,rgba(240,248,255,.95) 0%,rgba(180,200,255,.65) 25%,rgba(191,219,254,.25) 60%,transparent 100%);
-  border-radius:2px;
-  transform:rotate(215deg);
-  filter:drop-shadow(0 0 6px rgba(200,220,255,.55));
-  opacity:0;
-}
-.meteor.m1{top:-10%;left:62%;animation:meteorSweep 14s 0s ease-in infinite}
-.meteor.m2{top:-15%;left:38%;width:1.5px;height:65px;animation:meteorSweep 18s 4s ease-in infinite}
-.meteor.m3{top:-8%;left:82%;width:2.5px;height:95px;animation:meteorSweep 11s 7.5s ease-in infinite}
-.meteor.m4{top:-12%;left:20%;width:1.8px;height:72px;animation:meteorSweep 22s 12s ease-in infinite}
-.meteor.m5{top:-10%;left:52%;animation:meteorSweep 13s 19s ease-in infinite}
-@keyframes meteorSweep{
-  0%   { transform:translate3d(0,0,0) rotate(215deg); opacity:0; }
-  4%   { opacity:1; }
-  18%  { transform:translate3d(-360px,480px,0) rotate(215deg); opacity:1; }
-  22%  { transform:translate3d(-420px,560px,0) rotate(215deg); opacity:0; }
-  100% { transform:translate3d(-420px,560px,0) rotate(215deg); opacity:0; }
-}
-
-/* reduced motion：全部降级静止 */
-@media (prefers-reduced-motion:reduce){
-  body::before,body::after,.galaxy-band,.meteor{animation:none !important}
-  .meteor{display:none !important}
-}
-
-/* ===== Main Layout ===== */
-.app{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 24px}
-section{padding:88px 0;position:relative}
-.section-title{
-  font-size:14px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
-  color:var(--primary-soft);margin-bottom:14px;display:flex;align-items:center;gap:12px;
-}
-.section-title::before{
-  content:"";width:32px;height:2px;border-radius:2px;
-  background:linear-gradient(90deg,var(--primary),var(--accent-cyan));
-}
-.section-heading{
-  font-size:clamp(28px,4vw,42px);font-weight:800;line-height:1.15;margin-bottom:8px;
-  background:linear-gradient(135deg,var(--text-primary) 0%,var(--text-secondary) 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.section-sub{color:var(--text-secondary);font-size:16px;margin-bottom:40px;max-width:620px}
-
-/* ===== Navbar ===== */
-.navbar{
-  position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);
-  display:flex;align-items:center;justify-content:center;
-  transition:all .3s ease;
-}
-.navbar.scrolled{
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  background:var(--card-bg);
-  border-bottom:1px solid var(--card-border);
-}
-.nav-inner{
-  width:100%;max-width:1180px;padding:0 24px;
-  display:flex;align-items:center;justify-content:center;gap:24px;
-  position:relative;
-}
-.nav-links{display:flex;align-items:center;gap:8px;flex:1;justify-content:center}
-.nav-actions{margin-left:auto}
-.nav-link{
-  padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;
-  color:var(--text-secondary);transition:all .2s ease;position:relative;
-}
-.nav-link:hover{color:var(--text-primary);background:var(--card-bg)}
-.nav-link.active{color:var(--text-primary)}
-.nav-link.active::after{
-  content:"";position:absolute;bottom:2px;left:16px;right:16px;height:2px;
-  border-radius:2px;background:linear-gradient(90deg,var(--primary),var(--accent-cyan));
-}
-.nav-actions{display:flex;align-items:center;gap:8px}
-.icon-btn{
-  width:40px;height:40px;border-radius:10px;display:flex;align-items:center;
-  justify-content:center;color:var(--text-secondary);transition:all .2s ease;
-  background:var(--card-bg);border:1px solid var(--card-border);
-}
-.icon-btn:hover{
-  color:var(--text-primary);border-color:var(--card-hover-border);
-  box-shadow:var(--shadow-glow);transform:translateY(-1px);
-}
-.icon-btn svg{width:18px;height:18px}
-
-/* ===== Hero ===== */
-.hero{padding-top:calc(var(--nav-h) + 72px);padding-bottom:40px}
-.hero-card{
-  position:relative;padding:clamp(32px,5vw,56px);
-  background:var(--card-bg);backdrop-filter:blur(24px) saturate(180%);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  border:1px solid var(--card-border);border-radius:var(--radius-lg);
-  box-shadow:var(--shadow-soft);overflow:hidden;
-}
-.hero-card::before{
-  content:"";position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--primary),var(--accent-cyan),var(--accent-steel),var(--primary));
-  background-size:300% 100%;animation:borderFlow 6s linear infinite;
-}
-@keyframes borderFlow{0%{background-position:0 0}100%{background-position:300% 0}}
-.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap}
-.hero-info{flex:1;min-width:280px}
-.hero-avatar{
-  width:120px;height:120px;border-radius:28px;overflow:hidden;
-  background:linear-gradient(135deg,var(--primary) 0%,var(--accent-cyan) 100%);
-  box-shadow:0 12px 40px rgba(37,99,235,.36),inset 0 0 0 2px rgba(240,240,250,.18);
-  flex-shrink:0;position:relative;
-}
-.hero-avatar img{
-  width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit;
-}
-.hero-avatar::after{
-  content:"";position:absolute;inset:-4px;border-radius:32px;
-  background:linear-gradient(135deg,var(--primary),var(--accent-cyan),var(--accent-steel));
-  z-index:-1;filter:blur(12px);opacity:.35;
-}
-.hero-hello{font-size:15px;color:var(--accent-cyan);font-weight:600;margin-bottom:10px;letter-spacing:1px}
-.hero-name{
-  font-size:clamp(36px,6vw,60px);font-weight:900;line-height:1.05;margin-bottom:14px;
-  /* 回到系统无衬线字体：简洁专业 · 中英文搭配清晰 */
-  font-family:"Inter","SF Pro Display","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",
-    -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  background:linear-gradient(135deg,var(--text-primary) 0%,var(--primary-soft) 50%,var(--accent-cyan) 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.5px;
-}
-.hero-title{font-size:clamp(18px,2.5vw,22px);font-weight:600;color:var(--text-secondary);margin-bottom:18px}
-.hero-bio{color:var(--text-secondary);font-size:16px;max-width:560px;margin-bottom:28px}
-.skill-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
-.chip{
-  display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;
-  font-size:13px;font-weight:600;
-  /* 星空主题：星靛蓝底 · 星尘蓝字 */
-  background:rgba(37,99,235,.12);color:var(--primary-soft);
-  border:1px solid rgba(147,197,253,.28);transition:all .2s ease;
-  box-shadow:inset 0 1px 0 rgba(240,240,250,.05);
-}
-.chip:hover{transform:translateY(-2px);background:rgba(37,99,235,.22);border-color:var(--primary)}
-.chip.cyan{background:rgba(96,165,250,.10);color:var(--accent-cyan);border-color:rgba(96,165,250,.28)}
-.chip.cyan:hover{background:rgba(96,165,250,.18);border-color:var(--accent-cyan)}
-.chip.steel{background:rgba(191,219,254,.10);color:var(--accent-steel);border-color:rgba(191,219,254,.28)}
-.chip.steel:hover{background:rgba(191,219,254,.18);border-color:var(--accent-steel)}
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
-.btn{
-  display:inline-flex;align-items:center;gap:10px;padding:13px 24px;border-radius:12px;
-  font-size:15px;font-weight:600;transition:all .22s ease;position:relative;overflow:hidden;
-}
-.btn-primary{
-  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-soft) 100%);
-  color:#fff;box-shadow:0 6px 20px rgba(37,99,235,.36), inset 0 1px 0 rgba(255,255,255,.22);
-}
-.btn-primary:hover{
-  transform:translateY(-2px);box-shadow:0 10px 32px rgba(37,99,235,.52), inset 0 1px 0 rgba(255,255,255,.30);
-}
-.btn-primary::after{
-  content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent);
-  transition:left .5s ease;
-}
-.btn-primary:hover::after{left:100%}
-.btn-ghost{
-  background:var(--card-bg);color:var(--text-primary);
-  border:1px solid var(--card-border);backdrop-filter:blur(10px);
-}
-.btn-ghost:hover{border-color:var(--card-hover-border);transform:translateY(-2px);box-shadow:var(--shadow-glow)}
-.btn svg{width:18px;height:18px}
-
-/* ===== Highlights ===== */
-.highlights-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;
-}
-.highlight-card{
-  padding:28px 24px;border-radius:var(--radius-md);position:relative;overflow:hidden;
-  background:var(--card-bg);backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--card-border);transition:all .25s ease;
-}
-.highlight-card:hover{
-  transform:translateY(-4px);border-color:var(--card-hover-border);box-shadow:var(--shadow-glow);
-}
-.highlight-card::before{
-  content:"";position:absolute;top:0;left:0;width:4px;height:100%;
-  background:linear-gradient(180deg,var(--primary),var(--accent-cyan));
-}
-.highlight-num{
-  font-size:clamp(32px,4vw,48px);font-weight:900;line-height:1;margin-bottom:8px;
-  background:linear-gradient(135deg,var(--primary),var(--accent-cyan));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.highlight-label{font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
-.highlight-desc{font-size:13px;color:var(--text-muted)}
-
-/* ===== Tabs ===== */
-.tabs-wrap{margin-bottom:28px}
-.tabs{
-  display:inline-flex;gap:4px;padding:6px;border-radius:12px;
-  background:var(--card-bg);border:1px solid var(--card-border);
-  backdrop-filter:blur(10px);
-}
-.tab{
-  padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;
-  color:var(--text-secondary);transition:all .2s ease;white-space:nowrap;
-}
-.tab:hover{color:var(--text-primary)}
-.tab.active{
-  background:linear-gradient(135deg,var(--primary),var(--primary-soft));
-  color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.36);
-}
-.tab-panel{display:none;animation:fadeUp .35s ease both}
-.tab-panel.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* ===== Experience Items ===== */
-.exp-list{display:flex;flex-direction:column;gap:20px}
-.exp-item{
-  padding:26px;border-radius:var(--radius-md);
-  background:var(--card-bg);backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--card-border);transition:all .25s ease;position:relative;overflow:hidden;
-}
-.exp-item:hover{transform:translateY(-3px);border-color:var(--card-hover-border);box-shadow:var(--shadow-glow)}
-.exp-item::after{
-  content:"";position:absolute;top:0;right:0;width:180px;height:180px;
-  background:radial-gradient(circle,rgba(37,99,235,.14),transparent 70%);
-  opacity:0;transition:opacity .3s ease;pointer-events:none;
-}
-.exp-item:hover::after{opacity:1}
-.exp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:10px}
-.exp-title{font-size:18px;font-weight:700;color:var(--text-primary)}
-.exp-org{color:var(--primary-soft);font-weight:600;font-size:14px;margin-top:2px}
-.exp-time{font-size:13px;color:var(--text-muted);font-weight:500;white-space:nowrap;
-  padding:4px 12px;border-radius:999px;background:rgba(37,99,235,.10);border:1px solid rgba(191,219,254,.22)}
-.exp-points{margin-top:14px;display:flex;flex-direction:column;gap:8px}
-.exp-point{
-  display:flex;gap:10px;font-size:14.5px;color:var(--text-secondary);line-height:1.65;
-}
-.exp-point::before{
-  content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--accent-cyan));
-  margin-top:9px;box-shadow:0 0 0 4px rgba(37,99,235,.14);
-}
-
-/* ===== Projects ===== */
-.projects-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px;
-}
-.proj-card{
-  padding:26px;border-radius:var(--radius-md);position:relative;overflow:hidden;
-  background:var(--card-bg);backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--card-border);transition:all .28s ease;display:flex;flex-direction:column;
-}
-.proj-card:hover{transform:translateY(-6px);border-color:var(--card-hover-border);box-shadow:var(--shadow-glow)}
-.proj-card::before{
-  content:"";position:absolute;top:-1px;left:-1px;right:-1px;bottom:-1px;border-radius:inherit;
-  padding:1px;background:linear-gradient(135deg,var(--primary),var(--accent-cyan),var(--accent-steel));
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s ease;
-}
-.proj-card:hover::before{opacity:1}
-.proj-icon{
-  width:52px;height:52px;border-radius:14px;margin-bottom:18px;
-  background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(96,165,250,.22));
-  border:1px solid rgba(191,219,254,.28);
-  display:flex;align-items:center;justify-content:center;color:var(--primary-soft);
-  box-shadow:inset 0 1px 0 rgba(240,240,250,.05);
-}
-.proj-icon svg{width:24px;height:24px}
-.proj-name{font-size:19px;font-weight:800;color:var(--text-primary);margin-bottom:8px}
-.proj-stack{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 16px}
-.stack-tag{
-  font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:6px;
-  background:rgba(37,99,235,.10);color:var(--accent-cyan);border:1px solid rgba(37,99,235,.2);
-}
-.proj-result{font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:18px;flex:1}
-.proj-link{
-  display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;
-  color:var(--primary-soft);transition:gap .2s ease;
-}
-.proj-link:hover{gap:10px;color:var(--accent-cyan)}
-.proj-link svg{width:14px;height:14px}
-.proj-play{
-  display:inline-flex;align-items:center;justify-content:center;gap:4px;
-  margin-top:12px;padding:8px 18px;height:36px;border-radius:14px;
-  font-size:14px;font-weight:700;letter-spacing:.2px;
-  color:var(--text-primary);text-decoration:none;cursor:pointer;
-  background:var(--card-bg);border:1px solid var(--card-border);backdrop-filter:blur(10px);
-  transition:all .2s ease;
-}
-.proj-play:hover{
-  border-color:var(--card-hover-border);transform:translateY(-2px);
-  box-shadow:var(--shadow-glow);color:#fff;
-  background:linear-gradient(135deg,rgba(37,99,235,.55) 0%,rgba(96,165,250,.28) 100%);
-}
-@media print{.proj-play{display:none}}
-
-/* ===== Skills Matrix ===== */
-.skill-groups{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;
-}
-.skill-group{
-  padding:26px;border-radius:var(--radius-md);
-  background:var(--card-bg);backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--card-border);
-}
-.sg-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--card-border)}
-.sg-icon{
-  width:38px;height:38px;border-radius:10px;
-  background:linear-gradient(135deg,var(--primary),var(--accent-cyan));
-  display:flex;align-items:center;justify-content:center;color:#fff;
-}
-.sg-icon svg{width:18px;height:18px}
-.sg-name{font-size:16px;font-weight:800;color:var(--text-primary)}
-.sg-list{display:flex;flex-direction:column;gap:16px}
-.skill-row{display:flex;flex-direction:column;gap:7px}
-.skill-label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600}
-.skill-name{color:var(--text-secondary)}
-.skill-level{color:var(--primary-soft)}
-.skill-bar{
-  height:7px;border-radius:999px;background:rgba(37,99,235,.10);overflow:hidden;position:relative;
-}
-.skill-fill{
-  height:100%;border-radius:999px;width:0;
-  background:linear-gradient(90deg,var(--primary),var(--accent-cyan));
-  transition:width 1.2s cubic-bezier(.22,1,.36,1);
-  box-shadow:0 0 10px rgba(37,99,235,.38);
-}
-.skill-fill::after{
-  content:"";position:absolute;top:0;right:0;bottom:0;width:40px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35));
-}
-
-/* ===== Education & Certs ===== */
-.edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
-.edu-card,.cert-card{
-  padding:26px;border-radius:var(--radius-md);
-  background:var(--card-bg);backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--card-border);transition:all .25s ease;
-}
-.edu-card:hover,.cert-card:hover{transform:translateY(-3px);border-color:var(--card-hover-border);box-shadow:var(--shadow-glow)}
-.edu-head,.cert-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
-.edu-icon,.cert-icon{
-  width:44px;height:44px;border-radius:12px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;color:#fff;
-}
-.edu-icon{background:linear-gradient(135deg,var(--primary),var(--primary-soft))}
-.cert-icon{background:linear-gradient(135deg,var(--accent-cyan),#2563eb)}
-.edu-icon svg,.cert-icon svg{width:20px;height:20px}
-.edu-degree,.cert-name{font-size:17px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
-.edu-school,.cert-issuer{color:var(--primary-soft);font-weight:600;font-size:14px;margin-bottom:2px}
-.edu-time,.cert-time{font-size:13px;color:var(--text-muted);margin-top:8px}
-.cert-link-wrapper{
-  text-decoration:none;color:inherit;cursor:pointer;display:block;
-  border-radius:var(--radius-md);transition:transform .25s ease;
-}
-.cert-link-wrapper:hover .cert-card{transform:translateY(-3px);border-color:var(--card-hover-border);box-shadow:var(--shadow-glow)}
-.cert-hint{
-  display:inline-flex;align-items:center;gap:6px;margin-top:12px;
-  font-size:13px;font-weight:600;color:var(--primary-soft);transition:gap .2s ease;
-}
-.cert-hint svg{width:13px;height:13px}
-.cert-link-wrapper:hover .cert-hint{gap:10px;color:var(--accent-cyan)}
-.edu-note{font-size:13.5px;color:var(--text-secondary);margin-top:10px;padding-top:12px;border-top:1px dashed var(--card-border)}
-@media print{.cert-hint{display:none}.cert-link-wrapper{cursor:default}}
-
-/* ===== Footer ===== */
-.footer{
-  padding:40px 0 48px;margin-top:40px;text-align:center;
-  border-top:1px solid var(--card-border);
-}
-.footer-brand{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
-.footer-meta{display:none}
-
-/* ===== Back to Top ===== */
-.back-top{
-  position:fixed;right:28px;bottom:28px;z-index:50;
-  width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,var(--primary),var(--primary-soft));color:#fff;
-  box-shadow:0 8px 24px rgba(37,99,235,.40);
-  opacity:0;pointer-events:none;transform:translateY(10px);transition:all .25s ease;
-}
-.back-top.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
-.back-top:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(37,99,235,.56)}
-.back-top svg{width:20px;height:20px}
-
-/* ===== Toast ===== */
-.toast{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
-  padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;
-  background:linear-gradient(135deg,var(--primary),var(--accent-cyan));color:#fff;
-  box-shadow:0 8px 32px rgba(37,99,235,.44);
-  opacity:0;pointer-events:none;transition:all .3s ease;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ===== Responsive ===== */
-@media (max-width:840px){
-  .nav-links{display:none}
-  section{padding:64px 0}
-  .hero{padding-top:calc(var(--nav-h) + 40px)}
-  .hero-top{flex-direction:column-reverse}
-  .tabs{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
-  .app{padding:0 18px}
-}
-@media (max-width:520px){
-  .btn{padding:11px 18px;font-size:14px}
-  .hero-cta{flex-direction:column}
-  .hero-cta .btn{justify-content:center}
-  .exp-head{flex-direction:column}
-}
-
-/* ===== Reduced Motion ===== */
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
-  html{scroll-behavior:auto}
-}
-
-/* ===== Print Styles ===== */
-@media print{
-  body{
-    background:#fff !important;color:#111 !important;
-    font-size:12px;line-height:1.5;
-  }
-  body::before,.navbar,.back-top,.toast,.nav-actions{display:none !important}
-  .app{max-width:100%;padding:0;margin:0}
-  section{padding:20px 0 !important;page-break-inside:avoid}
-  .hero-card,.highlight-card,.exp-item,.proj-card,.skill-group,.edu-card,.cert-card{
-    background:#fff !important;color:#111 !important;
-    backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
-    border:1px solid #ddd !important;box-shadow:none !important;
-    page-break-inside:avoid;
-  }
-  .hero-card::before,.highlight-card::before,.skill-fill::after{display:none}
-  .tab-panel{display:block !important;page-break-inside:avoid;animation:none !important;margin-bottom:18px;padding-top:8px;border-top:1px solid #eee}
-  .tab-panel::before{content:attr(data-title);display:block;font-weight:700;font-size:14px;margin-bottom:10px;color:#2563eb}
-  .tabs{display:none !important}
-  .chip,.stack-tag,.exp-time{
-    background:#f5f5f5 !important;color:#333 !important;
-    border:1px solid #ddd !important;
-  }
-  .hero-name,.section-heading,.highlight-num{
-    background:none !important;-webkit-text-fill-color:#111 !important;color:#111 !important;
-    animation:none !important;filter:none !important;text-shadow:none !important;
-    letter-spacing:normal;font-family:"Inter","PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",Roboto,sans-serif;
-  }
-  .section-title{color:#2563eb !important;letter-spacing:1px}
-  .skill-bar{background:#eee !important}
-  .skill-fill{background:#2563eb !important;box-shadow:none !important}
-  a{color:#111 !important;text-decoration:underline}
-  .footer{border-top:1px solid #ddd}
-  @page{margin:1.5cm}
-}
-</style>
+    ol.steps {
+      list-style: none; padding: 20px 22px; margin: 0;
+      border-radius: 18px;
+      border: 1px dashed rgba(168,148,102,0.35);
+      background: rgba(168,148,102,0.05);
+    }
+    .steps-title {
+      font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 10px; font-weight: 600;
+    }
+    ol.steps > li {
+      display: grid; grid-template-columns: 28px 1fr;
+      gap: 14px; align-items: start;
+      margin-top: 10px;
+    }
+    .num {
+      width: 28px; height: 28px; border-radius: 9px;
+      background: rgba(107,142,90,0.16);
+      color: #c9ddb0;
+      display: grid; place-items: center;
+      font-weight: 700; font-size: 13px;
+      border: 1px solid rgba(107,142,90,0.35);
+    }
+    ol.steps > li p { margin: 0; font-size: 14px; }
+    .tip {
+      margin-top: 20px;
+      font-size: 12.5px; color: rgba(243,239,228,0.55); line-height: 1.8;
+    }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <div class="brand"><mark>Hachi</mark></div>
+    <span class="chapter">Entry · Redirect</span>
+    <h1>这里是作品集入口，正在为你<span class="accent">打开本地服务器…</span></h1>
 
-<!-- 银河盘斜带（仿 NASA 银河系 · Stripe 漩涡渐变宇宙版） -->
-<div class="galaxy-band" aria-hidden="true"></div>
+    <p>
+      本项目使用 <code>Vite + React + TypeScript</code>，必须通过 <strong>HTTP 本地服务器</strong>访问（
+      不是双击文件直接打开）。如果你看到的是这段提示，说明当前是 <code>file://</code> 协议，或者开发服务器尚未启动。
+    </p>
 
-<!-- 流星（稀疏简洁·右上→左下·无大光点） -->
-<div class="meteor m1" aria-hidden="true"></div>
-<div class="meteor m2" aria-hidden="true"></div>
-<div class="meteor m3" aria-hidden="true"></div>
-<div class="meteor m4" aria-hidden="true"></div>
-<div class="meteor m5" aria-hidden="true"></div>
-
-<!-- Navbar -->
-<nav class="navbar" id="navbar">
-  <div class="nav-inner">
-    <div class="nav-links" role="tablist">
-      <a href="#hero" class="nav-link" data-anchor="hero">首页</a>
-      <a href="#highlights" class="nav-link" data-anchor="highlights">成果</a>
-      <a href="#experience" class="nav-link" data-anchor="experience">经历</a>
-      <a href="#projects" class="nav-link" data-anchor="projects">项目</a>
-      <a href="#education" class="nav-link" data-anchor="education">教育</a>
+    <div class="status">
+      <span class="dot"></span>
+      <span id="status-text">正在检测并尝试跳转到开发服务器…</span>
     </div>
-    <div class="nav-actions">
-      <button class="icon-btn" id="printBtn" title="打印简历" aria-label="打印简历">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+
+    <div class="actions">
+      <a id="open-dev" class="btn btn-primary" href="http://localhost:5175/index.vite.html">
+        打开我的作品集 →
+      </a>
+      <button id="retry" class="btn btn-ghost" type="button" onclick="tryRedirect(true)">
+        重试自动跳转
       </button>
+      <a
+        class="btn btn-ghost"
+        href="https://cn.vitejs.dev/guide/"
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        查看 Vite 文档
+      </a>
     </div>
+
+    <ol class="steps">
+      <div class="steps-title">3 步启动（仅需首次）</div>
+      <li>
+        <div class="num">1</div>
+        <p>在项目根目录 <code>d:\TRAE\坦克大作战</code> 打开 PowerShell / CMD / 终端。</p>
+      </li>
+      <li>
+        <div class="num">2</div>
+        <p>安装依赖（已装可跳过）：<code>npm install</code><br/>
+           再启动开发服务器：<code>npx vite --port 5174</code></p>
+      </li>
+      <li>
+        <div class="num">3</div>
+        <p>终端输出地址后，点击或复制到浏览器：<code>http://localhost:5174/index.vite.html</code></p>
+      </li>
+    </ol>
+
+    <p class="tip">
+      路由使用 <code>#/xxx</code> 格式：#/skills 直达「个人技能」、#/hobbies 直达「个人爱好」、
+      #/achievements 直达「个人成就」、#/contact 直达「联系方式」。
+    </p>
   </div>
-</nav>
 
-<div class="app">
-  <!-- Hero -->
-  <section class="hero" id="hero">
-    <div class="hero-card">
-      <div class="hero-top">
-        <div class="hero-info">
-          <div class="hero-hello">✦ 你好，很高兴认识你</div>
-          <h1 class="hero-name" id="heroName">马畅</h1>
-          <div class="hero-title" id="heroTitle">AI 训练师 · 未来开发者</div>
-          <p class="hero-bio" id="heroBio">正在探索 AI 与创作的交汇点。热爱通过技术实现创意，专注于人工智能训练与独立项目开发，用代码把想象变成可触达的体验。</p>
-          <div class="skill-chips" id="heroChips"></div>
-          <div class="hero-cta">
-            <button class="btn btn-ghost" id="copyEmail">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
-              <span>复制邮箱地址</span>
-            </button>
-            <button class="btn btn-ghost" id="copyWechat">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3C5.1 3 2 5.6 2 8.8c0 1.8 1 3.4 2.6 4.5L4 15l2.2-1.1c.9.2 1.8.4 2.8.4h.6"/><path d="M15 7c3.9 0 7 2.6 7 5.8 0 1.8-1 3.4-2.6 4.5L20 18l-2.2-1.1c-.9.2-1.8.4-2.8.4-3.9 0-7-2.6-7-5.8S11.1 7 15 7z"/><circle cx="6.5" cy="8" r=".6" fill="currentColor"/><circle cx="8.5" cy="8" r=".6" fill="currentColor"/><circle cx="12.5" cy="12.8" r=".6" fill="currentColor"/><circle cx="17.5" cy="12.8" r=".6" fill="currentColor"/></svg>
-              <span>复制微信号</span>
-            </button>
-            <a href="#projects" class="btn btn-ghost">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              <span>查看我的项目</span>
-            </a>
-          </div>
-        </div>
-        <div class="hero-avatar" id="heroAvatar"><img src="avatar.jpg" alt="马畅头像"></div>
-      </div>
-    </div>
-  </section>
+  <script>
+    var statusText = document.getElementById('status-text');
+    var openBtn = document.getElementById('open-dev');
+    var CANDIDATE_PORTS = [5175, 5174, 5173, 5176, 5177];
 
-  <!-- Highlights -->
-  <section id="highlights">
-    <div class="section-title">HIGHLIGHTS · 亮点成果</div>
-    <h2 class="section-heading">值得关注的里程碑</h2>
-    <p class="section-sub">在学习与探索的路上，每一步都算数。</p>
-    <div class="highlights-grid" id="highlightsGrid"></div>
-  </section>
-
-  <!-- Experience (Tabs) -->
-  <section id="experience">
-    <div class="section-title">EXPERIENCE · 成长轨迹</div>
-    <h2 class="section-heading">多维经历记录</h2>
-    <p class="section-sub">校园内的积累、项目中的实践、专业上的深耕。</p>
-    <div class="tabs-wrap">
-      <div class="tabs" id="expTabs" role="tablist" aria-label="经历分类"></div>
-    </div>
-    <div id="expPanels"></div>
-  </section>
-
-  <!-- Projects (Tabs) -->
-  <section id="projects">
-    <div class="section-title">PROJECTS · 项目作品</div>
-    <h2 class="section-heading">我做过的东西</h2>
-    <p class="section-sub">把想法变成作品，在实践中快速成长。</p>
-    <div class="tabs-wrap">
-      <div class="tabs" id="projTabs" role="tablist" aria-label="项目分类"></div>
-    </div>
-    <div id="projPanels"></div>
-  </section>
-
-  <!-- Education & Certs -->
-  <section id="education">
-    <div class="section-title">EDUCATION · 教育与认证</div>
-    <h2 class="section-heading">学历与证书</h2>
-    <p class="section-sub">系统学习与官方认证的双重证明。</p>
-    <div style="display:grid;gap:40px">
-      <div>
-        <div style="font-size:13px;font-weight:700;letter-spacing:2px;color:var(--primary-soft);margin-bottom:18px;text-transform:uppercase">教育经历</div>
-        <div class="edu-grid" id="eduGrid"></div>
-      </div>
-      <div id="certsWrap">
-        <div style="font-size:13px;font-weight:700;letter-spacing:2px;color:var(--accent-cyan);margin-bottom:18px;text-transform:uppercase">专业认证</div>
-        <div class="edu-grid" id="certsGrid"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-brand">© 2026 马畅 · Made with Passion</div>
-    <div class="footer-meta" id="footerMeta">最后更新：2026年8月</div>
-  </footer>
-</div>
-
-<!-- Back to Top -->
-<button class="back-top" id="backTop" title="返回顶部" aria-label="返回顶部">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<script>
-/* ====== Resume Data ====== */
-const resume = {
-  name: "马畅",
-  initials: "MC",
-  title: "AI 训练师 · 未来开发者",
-  bio: "正在探索 AI 与创作的交汇点。热爱通过技术实现创意，专注于人工智能训练与独立项目开发，用代码把想象变成可触达的体验。",
-  emailUser: "2976234897",
-  emailDomain: "qq.com",
-  wechat: "hachi0906",
-  lastUpdated: "2026年8月",
-
-  heroChips: [
-    { label: "AI 训练", color: "blue" },
-    { label: "提示词工程", color: "cyan" },
-    { label: "独立游戏开发", color: "steel" },
-    { label: "STG 弹幕射击", color: "cyan" },
-    { label: "视频剪辑", color: "blue" },
-    { label: "内容创作", color: "steel" },
-  ],
-
-  highlights: [
-    { num: "2+", label: "独立游戏项目", desc: "边境保卫战 · 雾湖冰精传" },
-    { num: "高级", label: "AI 训练师认证", desc: "阿里巴巴达摩院官方认证" },
-    { num: "1", label: "校园合伙人", desc: "星辰科技校园合作项目" }
-  ],
-
-  experience: {
-    "校园生活": [
-      {
-        title: "26届新生",
-        org: "华南农业大学都柏林国际学院",
-        time: "2026 - 至今",
-        points: [
-          "开启大学生活，系统学习专业课程，构建扎实学术基础",
-          "积极参与校园活动与社团，拓展视野与社交圈",
-          "利用课余时间深耕 AI 开发与独立项目，实践驱动学习",
-        ],
-      },
-      {
-        title: "高中毕业生",
-        org: "佛山南海桂城中学",
-        time: "2023 - 2026",
-        points: [
-          "完成三年高中学业，打下坚实的理科与综合基础",
-          "在校期间保持对计算机与创作领域的兴趣与探索",
-          "通过高考顺利进入华南农业大学深造",
-        ],
-      },
-    ],
-    "项目实践": [
-      {
-        title: "独立游戏开发者",
-        org: "边境保卫战 · 坦克对战小游戏",
-        time: "2026",
-        points: [
-          "使用 TRAE 智能开发工具从零设计并实现完整的坦克对战游戏",
-          "负责关卡设计、战斗系统、成就体系、剧情结局等核心模块",
-          "精心打磨 UI 界面，采用现代军事风格设计，确保交互体验流畅",
-          "实现存档系统、技能树、基地血量机制等复杂游戏逻辑",
-        ],
-      },
-      {
-        title: "独立游戏开发者",
-        org: "雾湖冰精传 · 东方风格 STG",
-        time: "2026",
-        points: [
-          "设计东方 Project 风格的纵向卷轴弹幕射击游戏",
-          "实现多层弹幕系统（自机狙、环形弹、放射弹、激光）与难度曲线",
-          "构建 Boss 战阶段系统，6+ 弹幕形态切换与 Spell Card 机制",
-          "独立完成分数系统、残机系统、Bomb 系统等经典 STG 核心循环",
-        ],
-      },
-    ],
-    "专业训练": [
-      {
-        title: "高级 AI 训练师认证课程",
-        org: "阿里巴巴达摩院",
-        time: "2026",
-        points: [
-          "系统学习大模型训练与微调原理，掌握现代 AI 训练工作流",
-          "深入研究提示词工程、数据标注与模型评估方法论",
-          "通过严格的理论与实践考核，获得官方高级认证",
-        ],
-      },
-      {
-        title: "校园合伙人计划",
-        org: "星辰科技",
-        time: "2026",
-        points: [
-          "加入星辰科技校园合伙人项目，代表学校参与合作",
-          "参与 AI 技术在校园场景的落地探索与推广",
-          "积累行业资源，拓宽技术视野",
-        ],
-      },
-    ],
-  },
-
-  projects: {
-    "精选项目": [
-      {
-        name: "边境保卫战",
-        icon: "tank",
-        result: "一款完整的坦克对战网页小游戏。包含 8 个实战关卡 + 新兵训练教程，具有现代军事风格 UI、技能系统、成就体系与双结局剧情。可在浏览器直接运行，无外部依赖。",
-        stack: ["TRAE", "HTML5", "CSS3", "JavaScript", "Canvas"],
-        linkText: "在当前目录运行 tank-battle.html",
-        gameUrl: "tank-battle.html",
-      },
-      {
-        name: "雾湖冰精传",
-        icon: "stg",
-        result: "东方风格纵向卷轴 STG 弹幕射击小游戏。雾湖上的冰之妖精登场，支持多层弹幕（自机狙 / 环形弹 / 放射弹 / 激光）、多阶段 Boss 战与 Spell Card 击破记录、残机 Bomb 经典系统，上手易精通难，还原正统东方 STG 手感。",
-        stack: ["TRAE", "HTML5 Canvas", "JavaScript", "弹幕算法", "游戏设计"],
-        gameUrl: "plane-battle.html",
-      },
-    ],
-    "创作作品": [
-      {
-        name: "AI 创作合集",
-        icon: "sparkle",
-        result: "日常使用 AI 工具进行图像与文案创作，探索 AI 辅助创作的边界与可能性，积累多样风格的作品素材。",
-        stack: ["AI 绘图", "提示词", "风格探索"],
-      },
-      {
-        name: "动漫视频剪辑",
-        icon: "video",
-        result: "个人爱好项目，围绕动漫题材进行剪辑与二次创作，打磨节奏感与叙事能力，享受剪辑带来的表达乐趣。",
-        stack: ["Premiere", "After Effects", "节奏设计"],
-      },
-    ],
-  },
-
-  skills: [
-    {
-      category: "语言 & 框架",
-      icon: "code",
-      items: [
-        { name: "JavaScript / TypeScript", level: 78 },
-        { name: "HTML5 & CSS3", level: 85 },
-        { name: "Python", level: 70 },
-      ],
-    },
-    {
-      category: "AI & 工具链",
-      icon: "ai",
-      items: [
-        { name: "AI 提示词工程", level: 90 },
-        { name: "大模型训练 & 微调", level: 75 },
-        { name: "TRAE 智能开发", level: 88 },
-        { name: "数据标注 & 评估", level: 80 },
-      ],
-    },
-    {
-      category: "游戏 & 引擎",
-      icon: "stg",
-      items: [
-        { name: "Canvas 2D 游戏渲染", level: 84 },
-        { name: "弹幕算法 & 碰撞检测", level: 80 },
-        { name: "关卡 & Boss 设计", level: 78 },
-        { name: "游戏 UI / HUD 审美", level: 82 },
-      ],
-    },
-    {
-      category: "软实力",
-      icon: "star",
-      items: [
-        { name: "快速学习能力", level: 92 },
-        { name: "独立解决问题", level: 85 },
-        { name: "跨领域思维", level: 88 },
-      ],
-    },
-  ],
-
-  education: [
-    {
-      degree: "本科在读（26届新生）",
-      school: "华南农业大学 · 都柏林国际学院",
-      time: "2026 - 至今",
-      note: "国际化办学环境，接受中英双语教学体系培养，聚焦前沿科技方向。",
-    },
-    {
-      degree: "高中",
-      school: "佛山南海桂城中学",
-      time: "2023 - 2026",
-      note: "完成全日制高中学业，理科方向，奠定扎实的数理基础与综合素养。",
-    },
-  ],
-
-  certifications: [
-    {
-      name: "高级 AI 训练师",
-      issuer: "阿里巴巴达摩院 · 官方认证",
-      time: "2026 年获得",
-    },
-  ],
-
-  partners: [
-    {
-      name: "校园合伙人",
-      issuer: "星辰科技",
-      time: "2026 年加入",
-      imageUrl: "partner-cert.jpg",
-    },
-  ],
-};
-
-/* ====== SVG Icons ====== */
-const ICONS = {
-  tank: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="13" width="20" height="6" rx="1"/><rect x="6" y="8" width="10" height="5" rx="1"/><path d="M16 10h6l-2 3"/><circle cx="7" cy="19" r="1.5"/><circle cx="12" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>`,
-  stg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L10 10 L4 12 L10 14 L12 21 L14 14 L20 12 L14 10 Z"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M5 4l2 2M19 4l-2 2M5 20l2-2M19 20l-2-2"/></svg>`,
-  sparkle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M19 14l.9 2.3L22 17l-2.1.7L19 20l-.9-2.3L16 17l2.1-.7z"/></svg>`,
-  video: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><polygon points="22 8 16 11 16 13 22 16 22 8"/></svg>`,
-  code: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-  ai: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 10h.01M16 10h.01M9 16c1 1 2 2 3 2s2-1 3-2"/></svg>`,
-  pen: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>`,
-  star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  edu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg>`,
-  cert: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>`,
-  link: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-5-5 5-5"/><path d="M17 7l5 5-5 5"/><path d="M3 12h14"/></svg>`,
-};
-
-/* ====== Helpers ====== */
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-
-function showToast(msg, duration = 2000) {
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove("show"), duration);
-}
-
-/* ====== Render: Hero Chips ====== */
-function renderHeroChips() {
-  const box = $("#heroChips");
-  box.innerHTML = resume.heroChips.map(c => {
-    const cls = c.color === "cyan" ? "cyan" : c.color === "steel" ? "steel" : "";
-    return `<span class="chip ${cls}">${c.label}</span>`;
-  }).join("");
-}
-
-/* ====== Render: Highlights ====== */
-function renderHighlights() {
-  const grid = $("#highlightsGrid");
-  if (!resume.highlights?.length) {
-    grid.parentElement.style.display = "none";
-    return;
-  }
-  grid.innerHTML = resume.highlights.map(h => `
-    <div class="highlight-card">
-      <div class="highlight-num">${h.num}</div>
-      <div class="highlight-label">${h.label}</div>
-      <div class="highlight-desc">${h.desc || ""}</div>
-    </div>
-  `).join("");
-}
-
-/* ====== Render: Tabs ====== */
-function buildTabs({ tabsContainer, panelsContainer, tabData, renderPanel, ariaPrefix }) {
-  const tabKeys = Object.keys(tabData);
-  tabsContainer.innerHTML = tabKeys.map((k, i) => `
-    <button class="tab ${i === 0 ? "active" : ""}" role="tab" 
-      id="tab-${ariaPrefix}-${i}" aria-selected="${i === 0}"
-      aria-controls="panel-${ariaPrefix}-${i}" tabindex="${i === 0 ? 0 : -1}"
-      data-tabkey="${k}" data-idx="${i}">${k}</button>
-  `).join("");
-
-  panelsContainer.innerHTML = tabKeys.map((k, i) => `
-    <div class="tab-panel ${i === 0 ? "active" : ""}" 
-      id="panel-${ariaPrefix}-${i}" role="tabpanel" 
-      aria-labelledby="tab-${ariaPrefix}-${i}"
-      data-title="${k}" data-idx="${i}">
-      ${renderPanel(k, tabData[k], i)}
-    </div>
-  `).join("");
-
-  tabsContainer.querySelectorAll(".tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const idx = +btn.dataset.idx;
-      activateTab(tabsContainer, panelsContainer, idx);
-    });
-  });
-
-  tabsContainer.addEventListener("keydown", (e) => {
-    const tabs = $$(".tab", tabsContainer);
-    const cur = tabs.findIndex(t => t.classList.contains("active"));
-    let next = -1;
-    if (e.key === "ArrowRight") next = (cur + 1) % tabs.length;
-    else if (e.key === "ArrowLeft") next = (cur - 1 + tabs.length) % tabs.length;
-    else if (e.key === "Home") next = 0;
-    else if (e.key === "End") next = tabs.length - 1;
-    if (next >= 0) {
-      e.preventDefault();
-      activateTab(tabsContainer, panelsContainer, next);
-      tabs[next].focus();
+    // ========== 公共：对 5 个端口并发 Image probe，找活的 Vite 端口 ==========
+    //   重要：Image probe 对"死端口"会在 DevTools 里记成 net::ERR_ABORTED（这是浏览器行为，
+    //   不是真实请求失败）。为了不让用户在 Console 里看到红色 error，我们切换成：
+    //   → 使用 fetch({mode:'no-cors',cache:'no-store',signal:AbortSignal.timeout(...)})
+    //     这种方式死端口只会 reject（被我们 catch 掉），不再往 Console 打红色 ABORTED 噪音。
+    function probePorts(onFound, onAllDone) {
+      var done = false;
+      var finished = 0;
+      var TIMEOUT_MS = 1800;
+      CANDIDATE_PORTS.forEach(function (port) {
+        var finishedThis = false;
+        function finishOne(status) {
+          if (finishedThis) return;
+          finishedThis = true;
+          finished += 1;
+          if (status === 'ok' && !done) {
+            done = true;
+            if (onFound) onFound(port);
+          }
+          if (finished === CANDIDATE_PORTS.length && !done && onAllDone) onAllDone();
+        }
+        try {
+          var ctrl = null;
+          if (typeof AbortController !== 'undefined') {
+            ctrl = new AbortController();
+            setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
+          } else {
+            setTimeout(function () { finishOne('timeout'); }, TIMEOUT_MS);
+          }
+          var url = 'http://localhost:' + port + '/favicon.ico?t=' + Date.now() + '&p=' + port;
+          var p = fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'no-store',
+            credentials: 'omit',
+            redirect: 'follow',
+            signal: ctrl ? ctrl.signal : undefined,
+          });
+          p.then(function () { finishOne('ok'); }).catch(function () { finishOne('dead'); });
+        } catch (e) {
+          finishOne('dead');
+        }
+      });
     }
-  });
-}
 
-function activateTab(tabsContainer, panelsContainer, idx) {
-  $$(".tab", tabsContainer).forEach((t, i) => {
-    const active = i === idx;
-    t.classList.toggle("active", active);
-    t.setAttribute("aria-selected", active);
-    t.setAttribute("tabindex", active ? 0 : -1);
-  });
-  $$(".tab-panel", panelsContainer).forEach((p, i) => {
-    p.classList.toggle("active", i === idx);
-  });
-}
-
-/* ====== Render: Experience ====== */
-function renderExperience() {
-  buildTabs({
-    tabsContainer: $("#expTabs"),
-    panelsContainer: $("#expPanels"),
-    tabData: resume.experience || {},
-    ariaPrefix: "exp",
-    renderPanel: (key, items) => {
-      if (!items?.length) return `<div style="color:var(--text-muted);padding:20px">暂无内容</div>`;
-      return `<div class="exp-list">${items.map(it => `
-        <div class="exp-item">
-          <div class="exp-head">
-            <div>
-              <div class="exp-title">${it.title}</div>
-              <div class="exp-org">${it.org || ""}</div>
-            </div>
-            <span class="exp-time">${it.time || ""}</span>
-          </div>
-          <div class="exp-points">
-            ${(it.points || []).map(p => `<div class="exp-point">${p}</div>`).join("")}
-          </div>
-        </div>
-      `).join("")}</div>`;
+    // ========== 1) HTTP 访问 index.html → 先 probe 找存活端口，再跳 index.vite.html ==========
+    //     不直接 location.replace('/index.vite.html')：同步 replace 在新文档开始加载时
+    //     会把旧请求标记为 ABORTED（尤其当 replace 和 Vite HMR/同源刷新同时触发时）
+    if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+      statusText.textContent = '正在检测当前 Vite 端口…';
+      probePorts(
+        function (port) {
+          statusText.textContent = '已找到 Vite（端口 ' + port + '），正在跳转到作品集…';
+          var target = 'http://localhost:' + port + '/index.vite.html' + window.location.hash;
+          // 用 setTimeout + assign 避免同步跳转被浏览器记为旧请求取消
+          setTimeout(function () { window.location.assign(target); }, 60);
+        },
+        function () {
+          // 5 个端口全死 → fallback：按当前主机/协议相对跳（保留用户可能的自定义端口）
+          statusText.textContent = '未检测到多端口，尝试同路径跳转…';
+          setTimeout(function () {
+            window.location.assign('/index.vite.html' + window.location.hash);
+          }, 400);
+        }
+      );
     }
-  });
-}
 
-/* ====== Render: Projects ====== */
-function renderProjects() {
-  buildTabs({
-    tabsContainer: $("#projTabs"),
-    panelsContainer: $("#projPanels"),
-    tabData: resume.projects || {},
-    ariaPrefix: "proj",
-    renderPanel: (key, items) => {
-      if (!items?.length) return `<div style="color:var(--text-muted);padding:20px">暂无项目</div>`;
-      return `<div class="projects-grid">${items.map(p => `
-        <div class="proj-card">
-          <div class="proj-icon">${ICONS[p.icon] || ICONS.star}</div>
-          <div class="proj-name">${p.name}</div>
-          <div class="proj-stack">
-            ${(p.stack || []).map(s => `<span class="stack-tag">${s}</span>`).join("")}
-          </div>
-          <div class="proj-result">${p.result || ""}</div>
-          ${p.linkText ? `<div class="proj-link">${ICONS.link}<span>${p.linkText}</span></div>` : ""}
-          ${p.gameUrl ? `<a href="${p.gameUrl}" target="_blank" rel="noopener noreferrer" class="proj-play" title="开始游玩 ${p.name}">▶&nbsp;&nbsp;点击开玩</a>` : ""}
-        </div>
-      `).join("")}</div>`;
+    function tryRedirect(manual) {
+      statusText.textContent = manual
+        ? '重新扫描 5173-5177 端口…'
+        : '正在检测并尝试跳转到开发服务器…';
+      probePorts(
+        function (port) {
+          var target = 'http://localhost:' + port + '/index.vite.html' + window.location.hash;
+          statusText.textContent = '已检测到开发服务器（端口 ' + port + '），正在跳转…';
+          // 同步按钮 href 也一起刷新为活端口，方便用户下一次直接点
+          if (openBtn) openBtn.href = target;
+          setTimeout(function () { window.location.href = target; }, 60);
+        },
+        function () {
+          statusText.textContent = manual
+            ? '未检测到开发服务器，请先在终端运行 npx vite，然后再点击上方按钮。'
+            : '未检测到本地开发服务器，请按下方 3 步启动后再访问。';
+        }
+      );
     }
-  });
-}
 
-/* ====== Render: Education & Certs ====== */
-function renderEduCerts() {
-  const eduGrid = $("#eduGrid");
-  if (resume.education?.length) {
-    eduGrid.innerHTML = resume.education.map(e => `
-      <div class="edu-card">
-        <div class="edu-head">
-          <div class="edu-icon">${ICONS.edu}</div>
-          <div style="flex:1">
-            <div class="edu-degree">${e.degree}</div>
-            <div class="edu-school">${e.school}</div>
-          </div>
-        </div>
-        <div class="edu-time">${e.time || ""}</div>
-        ${e.note ? `<div class="edu-note">${e.note}</div>` : ""}
-      </div>
-    `).join("");
-  } else {
-    eduGrid.parentElement.parentElement.style.display = "none";
-  }
-
-  const certList = [...(resume.certifications || []), ...(resume.partners || [])];
-  const certsGrid = $("#certsGrid");
-  const certsWrap = $("#certsWrap");
-  if (certList.length) {
-    certsGrid.innerHTML = certList.map(c => {
-      const card = `
-      <div class="cert-card">
-        <div class="cert-head">
-          <div class="cert-icon">${ICONS.cert}</div>
-          <div style="flex:1">
-            <div class="cert-name">${c.name}</div>
-            <div class="cert-issuer">${c.issuer}</div>
-          </div>
-        </div>
-        <div class="cert-time">${c.time || ""}</div>
-        ${c.imageUrl ? `<div class="cert-hint">${ICONS.link || ""}<span>点击查看凭证截图 →</span></div>` : ""}
-      </div>`;
-      return c.imageUrl
-        ? `<a href="${c.imageUrl}" target="_blank" rel="noopener noreferrer" class="cert-link-wrapper" title="查看 ${c.name} 凭证截图">${card}</a>`
-        : card;
-    }).join("");
-  } else {
-    certsWrap.style.display = "none";
-  }
-}
-
-/* ====== Navbar scroll ====== */
-function initNavbar() {
-  const nav = $("#navbar");
-  const onScroll = () => {
-    nav.classList.toggle("scrolled", window.scrollY > 16);
-    $("#backTop").classList.toggle("visible", window.scrollY > 500);
-    const scrollPos = window.scrollY + 120;
-    $$(".nav-link[data-anchor]").forEach(l => {
-      const el = document.getElementById(l.dataset.anchor);
-      if (!el) return;
-      const top = el.offsetTop;
-      const bot = top + el.offsetHeight;
-      l.classList.toggle("active", scrollPos >= top && scrollPos < bot);
-    });
-  };
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
-}
-
-/* ====== Copy Email ====== */
-function initEmailCopy() {
-  $("#copyEmail").addEventListener("click", async () => {
-    const email = `${resume.emailUser}@${resume.emailDomain}`;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(email);
-      } else {
-        const ta = document.createElement("textarea");
-        ta.value = email; ta.style.position = "fixed"; ta.style.opacity = "0";
-        document.body.appendChild(ta); ta.select();
-        document.execCommand("copy"); document.body.removeChild(ta);
-      }
-      showToast("✓ 邮箱已复制：" + email);
-    } catch (e) {
-      showToast("邮箱：" + email, 3500);
+    // ========== 2) file:// 打开 → 尝试自动跳 + 同步按钮 href 到首个活端口 ==========
+    if (window.location.protocol === 'file:') {
+      try {
+        probePorts(function (port) {
+          var target = 'http://localhost:' + port + '/index.vite.html' + window.location.hash;
+          if (openBtn) openBtn.href = target;
+        }, function () {});
+        tryRedirect(false);
+      } catch (e) { /* ignore */ }
     }
-  });
-}
-
-/* ====== Copy Wechat ====== */
-function initWechatCopy() {
-  $("#copyWechat").addEventListener("click", async () => {
-    const wx = resume.wechat;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(wx);
-      } else {
-        const ta = document.createElement("textarea");
-        ta.value = wx; ta.style.position = "fixed"; ta.style.opacity = "0";
-        document.body.appendChild(ta); ta.select();
-        document.execCommand("copy"); document.body.removeChild(ta);
-      }
-      showToast("✓ 微信号已复制：" + wx);
-    } catch (e) {
-      showToast("微信号：" + wx, 3500);
-    }
-  });
-}
-
-/* ====== Print ====== */
-function initPrint() {
-  $("#printBtn").addEventListener("click", () => window.print());
-}
-
-/* ====== Back to Top ====== */
-function initBackTop() {
-  $("#backTop").addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-}
-
-/* ====== Init ====== */
-function init() {
-  $("#heroName").textContent = resume.name;
-  // heroAvatar已改为<img src="avatar.jpg">头像图片，不再写入首字母占位
-  $("#heroTitle").textContent = resume.title;
-  $("#heroBio").textContent = resume.bio;
-  document.title = `${resume.name} · 个人简历`;
-  $("#footerMeta") && ($("#footerMeta").textContent = `最后更新：${resume.lastUpdated || new Date().getFullYear() + "年"}`);
-
-  renderHeroChips();
-  renderHighlights();
-  renderExperience();
-  renderProjects();
-  renderEduCerts();
-
-  initNavbar();
-  initEmailCopy();
-  initWechatCopy();
-  initPrint();
-  initBackTop();
-}
-
-document.addEventListener("DOMContentLoaded", init);
-</script>
+  </script>
 </body>
 </html>
