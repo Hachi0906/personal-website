@@ -200,15 +200,17 @@
     var openBtn = document.getElementById('open-dev');
     var CANDIDATE_PORTS = [5175, 5174, 5173, 5176, 5177];
 
-    // ========== 公共：对 5 个端口并发 Image probe，找活的 Vite 端口 ==========
-    //   重要：Image probe 对"死端口"会在 DevTools 里记成 net::ERR_ABORTED（这是浏览器行为，
-    //   不是真实请求失败）。为了不让用户在 Console 里看到红色 error，我们切换成：
-    //   → 使用 fetch({mode:'no-cors',cache:'no-store',signal:AbortSignal.timeout(...)})
-    //     这种方式死端口只会 reject（被我们 catch 掉），不再往 Console 打红色 ABORTED 噪音。
+    // ========== 公共：对 5 个端口并发探活，找活的 Vite 端口 ==========
+    //   关键修复（ERR_ABORTED 清零）：
+    //   ① 不再用 AbortController 主动 abort 请求——主动 abort 会让 Chrome 在 Console 里
+    //     强制记一条 net::ERR_ABORTED 红字（无论 fetch 模式是 no-cors 还是 cors）。
+    //     改为：只设 setTimeout 收尾判死端口，绝不 ctrl.abort() 取消 in-flight 请求；
+    //     死端口 TCP RST 会让 fetch 立即 reject catch，根本不用等 1.8s。
+    //   ② 改探活目标为 /@vite/client（Vite dev server 100% 会有这个 script，比 favicon 可靠）
     function probePorts(onFound, onAllDone) {
       var done = false;
       var finished = 0;
-      var TIMEOUT_MS = 1800;
+      var TIMEOUT_MS = 2000;
       CANDIDATE_PORTS.forEach(function (port) {
         var finishedThis = false;
         function finishOne(status) {
@@ -222,22 +224,18 @@
           if (finished === CANDIDATE_PORTS.length && !done && onAllDone) onAllDone();
         }
         try {
-          var ctrl = null;
-          if (typeof AbortController !== 'undefined') {
-            ctrl = new AbortController();
-            setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
-          } else {
-            setTimeout(function () { finishOne('timeout'); }, TIMEOUT_MS);
-          }
-          var url = 'http://localhost:' + port + '/favicon.ico?t=' + Date.now() + '&p=' + port;
+          // 安全网：2s 强制收尾（但不 abort fetch，避免 Console 红字）
+          setTimeout(function () { finishOne('timeout'); }, TIMEOUT_MS);
+          var url = 'http://localhost:' + port + '/@vite/client';
           var p = fetch(url, {
             method: 'GET',
             mode: 'no-cors',
             cache: 'no-store',
             credentials: 'omit',
             redirect: 'follow',
-            signal: ctrl ? ctrl.signal : undefined,
+            // 去掉 signal！任何主动 abort 都会触发 Chrome 的 ERR_ABORTED 红错日志
           });
+          // no-cors 模式下，无论 200/404/302 都会走 then（opaque response），视为活端口
           p.then(function () { finishOne('ok'); }).catch(function () { finishOne('dead'); });
         } catch (e) {
           finishOne('dead');
@@ -245,26 +243,15 @@
       });
     }
 
-    // ========== 1) HTTP 访问 index.html → 先 probe 找存活端口，再跳 index.vite.html ==========
-    //     不直接 location.replace('/index.vite.html')：同步 replace 在新文档开始加载时
-    //     会把旧请求标记为 ABORTED（尤其当 replace 和 Vite HMR/同源刷新同时触发时）
+    // ========== 1) HTTP 访问 index.html → 不 probe，直接相对路径跳 ==========
+    //   能访问 index.html = 当前主机/端口的 Vite 100% 活着，根本没必要 probe 5 个端口！
+    //   之前 probe + 60ms 跳转 = 文档卸载时 5 个 in-flight fetch 被取消 → 5 条 ERR_ABORTED
     if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-      statusText.textContent = '正在检测当前 Vite 端口…';
-      probePorts(
-        function (port) {
-          statusText.textContent = '已找到 Vite（端口 ' + port + '），正在跳转到作品集…';
-          var target = 'http://localhost:' + port + '/index.vite.html' + window.location.hash;
-          // 用 setTimeout + assign 避免同步跳转被浏览器记为旧请求取消
-          setTimeout(function () { window.location.assign(target); }, 60);
-        },
-        function () {
-          // 5 个端口全死 → fallback：按当前主机/协议相对跳（保留用户可能的自定义端口）
-          statusText.textContent = '未检测到多端口，尝试同路径跳转…';
-          setTimeout(function () {
-            window.location.assign('/index.vite.html' + window.location.hash);
-          }, 400);
-        }
-      );
+      statusText.textContent = '正在进入作品集…';
+      // 异步 + assign（不 replace）避免浏览器把"旧文档取消"算成 ABORTED 假阳性
+      setTimeout(function () {
+        window.location.assign('/index.vite.html' + window.location.hash);
+      }, 40);
     }
 
     function tryRedirect(manual) {

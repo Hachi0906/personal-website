@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import {
   Award,
   Trophy,
@@ -9,6 +10,52 @@ import {
   Shield,
   type LucideIcon,
 } from "lucide-react";
+
+/**
+ * 给 Chapter 04 的所有 .achv-reveal 元素（stat / 岩层头 / 成就卡片）挂载
+ * 单个共享的 IntersectionObserver：
+ *  - 进入视口底部约 18%（rootMargin）就加 .is-revealed，触发 CSS keyframes
+ *  - once=true：触发一次就 disconnect，不重复弹（防止上滑下滑反复重播造成视觉疲劳）
+ */
+function useAchievementReveal<T extends HTMLElement>(
+  sectionRef: React.RefObject<T>,
+) {
+  useLayoutEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+
+    const targets = Array.from(
+      root.querySelectorAll<HTMLElement>(".achv-reveal"),
+    );
+    if (targets.length === 0) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      // 不支持 IO 的老浏览器：直接全部 show，不做动画
+      targets.forEach((el) => el.classList.add("is-revealed"));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            el.classList.add("is-revealed");
+            io.unobserve(el); // once：弹出过就不再观察
+          }
+        });
+      },
+      {
+        // 离底部还有 18% 视口高度就触发——用户往下滑"刚好看到它弹出"
+        rootMargin: "0px 0px -18% 0px",
+        threshold: 0.15,
+      },
+    );
+
+    targets.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [sectionRef]);
+}
 
 interface Achievement {
   title: string;
@@ -73,8 +120,10 @@ const TIER_STYLES: Record<Achievement["tier"], { label: string; text: string; bo
  * （单页版）Chapter 04 · 个人成就
  */
 export default function AchievementsPage() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  useAchievementReveal(sectionRef);
   return (
-    <div className="pb-20 px-5 sm:px-8 md:px-12 lg:px-20 max-w-7xl mx-auto">
+    <div ref={sectionRef} className="pb-20 px-5 sm:px-8 md:px-12 lg:px-20 max-w-7xl mx-auto">
       <header className="mb-14 md:mb-20 pt-4 md:pt-8 hero-anim hero-reveal">
         <span className="inline-block text-xs md:text-sm tracking-[0.25em] uppercase text-[#e8702a] font-semibold mb-5">
           Chapter · 04
@@ -96,8 +145,8 @@ export default function AchievementsPage() {
         ].map((stat, i) => (
           <div
             key={stat.label}
-            className="rounded-2xl p-5 md:p-6 bg-white/8 backdrop-blur-xl border border-white/20 text-center hero-anim hero-fade"
-            style={{ animationDelay: `${0.08 * i}s` }}
+            className="rounded-2xl p-5 md:p-6 bg-white/8 backdrop-blur-xl border border-white/20 text-center hero-anim hero-fade achv-reveal achv-reveal--stat"
+            style={{ animationDelay: `${0.08 * i}s`, ['--reveal-delay' as any]: `${(i + 1) * 0.07}s` }}
           >
             <div className={`text-4xl md:text-5xl font-bold ${stat.accent} font-mono mb-2`}>
               {stat.num}
@@ -111,7 +160,7 @@ export default function AchievementsPage() {
         <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[#5f78a0]/50 via-[#6b8e5a]/40 to-[#a89466]/60 -translate-x-1/2" />
 
         <div className="space-y-10 md:space-y-14">
-          {STRATA.map((stratum) => {
+          {STRATA.map((stratum, strata_i) => {
             const tierStyle = TIER_STYLES[stratum.tier];
             const tierItems = ACHIEVEMENTS.filter((a) => a.tier === stratum.tier);
             // 计算这一层的起始索引，保证左右交替在全局看来连续
@@ -119,7 +168,7 @@ export default function AchievementsPage() {
             return (
               <div key={stratum.tier} className="relative">
                 {/* 地层分界带：顶部的岩层纹 + Stratum 标签 */}
-                <div className="relative mb-8 md:mb-10">
+                <div className="relative mb-8 md:mb-10 achv-reveal achv-reveal--stratum" style={{ ['--reveal-delay' as any]: `${0.05 + strata_i * 0.04}s` }}>
                   {/* 岩层细纹带（10 条不等宽水平线表现沉积层理） */}
                   <div className="relative h-14 md:h-16 overflow-hidden rounded-2xl border border-white/10">
                     <div
@@ -201,7 +250,8 @@ export default function AchievementsPage() {
                           }`}
                         >
                           <article
-                            className={`rounded-2xl p-6 md:p-7 backdrop-blur-xl border border-white/20 ${tier.bg} hover:border-white/40 transition-all`}
+                            className={`rounded-2xl p-6 md:p-7 backdrop-blur-xl border border-white/20 ${tier.bg} hover:border-white/40 transition-all achv-reveal achv-reveal--card${isLeft ? 'Left' : 'Right'}`}
+                            style={{ ['--reveal-delay' as any]: `${(globalI + 1) * 0.065}s` }}
                           >
                             <div
                               className={`flex items-start gap-4 mb-4 ${

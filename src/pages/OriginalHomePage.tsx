@@ -18,26 +18,50 @@ export default function OriginalHomePage() {
               Chapter · 01
             </span>
 
-            {/* ====== 醒目标识 MACHANG：Playfair 衬线白字 + 入场推出（已删除 hover 花开特效） ====== */}
-            <div className="machang-wrap inline-flex select-none cursor-default mb-7 md:mb-9">
-              <span>
-                {"MACHANG".split("").map((ch, i) => (
-                  <span
-                    key={i}
-                    className={`machang-char mc-${i} font-playfair italic font-semibold text-white leading-none`}
-                    style={{
-                      /* 参照 Hachi (Playfair italic) + 尺寸：mobile 48px / md 74px / lg 100px / xl 120px */
-                      fontSize: "clamp(3rem, 8.5vw, 7.5rem)",
-                      /* 入场逐字延迟：从左至右 0.25s 开始，每字 0.08s 推出 */
-                      animationDelay: `${0.25 + i * 0.08}s`,
-                      /* 字间距：0.03em 给 Playfair 大字足够呼吸感 */
-                      marginLeft: i === 0 ? 0 : "0.03em",
-                    }}
-                  >
-                    {ch}
-                  </span>
-                ))}
-              </span>
+            {/* ====== 醒目标识 MACHANG：Playfair 衬线白字 + 入场推出（MA 一行 / CHANG 起新行左对齐，整体往右挪避免贴左边缘） ====== */}
+            <div className="machang-wrap inline-flex flex-col select-none cursor-default mb-7 md:mb-9 ml-3 sm:ml-6 md:ml-10 lg:ml-16">
+              {/* 第一行：MA（2 字母，索引 0 / 1） */}
+              <div className="block leading-[1]">
+                {"MA".split("").map((ch, localIdx) => {
+                  const i = localIdx;
+                  return (
+                    <span
+                      key={`row1-${i}`}
+                      className={`machang-char mc-${i} font-playfair italic font-semibold text-white leading-none`}
+                      style={{
+                        /* 参照 Hachi (Playfair italic) + 尺寸：mobile 48px / md 74px / lg 100px / xl 120px */
+                        fontSize: "clamp(3rem, 8.5vw, 7.5rem)",
+                        /* 入场逐字延迟：从左至右 0.25s 开始，每字 0.08s 推出 */
+                        animationDelay: `${0.25 + i * 0.08}s`,
+                        /* 字间距：0.03em 给 Playfair 大字足够呼吸感 */
+                        marginLeft: i === 0 ? 0 : "0.03em",
+                      }}
+                    >
+                      {ch}
+                    </span>
+                  );
+                })}
+              </div>
+              {/* 第二行：CHANG（5 字母，索引 2 / 3 / 4 / 5 / 6）—— 左对齐第一行 MA，取消之前的错落缩进 */}
+              <div className="block leading-[1] mt-2 md:mt-3 ml-0">
+                {"CHANG".split("").map((ch, localIdx) => {
+                  const i = 2 + localIdx;
+                  return (
+                    <span
+                      key={`row2-${i}`}
+                      className={`machang-char mc-${i} font-playfair italic font-semibold text-white leading-none`}
+                      style={{
+                        fontSize: "clamp(3rem, 8.5vw, 7.5rem)",
+                        /* 承接上一行的逐字时间轴：M A 2 字 0.25 + 0.33 → C 接着 0.41 开始 */
+                        animationDelay: `${0.25 + i * 0.08}s`,
+                        marginLeft: i === 2 ? 0 : "0.03em",
+                      }}
+                    >
+                      {ch}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
 
             <p className="text-white/90 text-[15px] md:text-lg leading-[1.9] md:leading-[2] max-w-xl">

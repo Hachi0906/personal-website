@@ -283,10 +283,14 @@
       }
 
       // ========== 静默端口探测：fetch + mode=no-cors，死端口不刷 Console 红错 ==========
+      //   关键修复：去掉 AbortController.signal——任何主动 ctrl.abort() 都会让 Chrome
+      //   在 Console 里强制打 net::ERR_ABORTED 红字（无论模式是什么）。
+      //   现在改用 setTimeout 2s 收尾但不 abort fetch：死端口 TCP 会立即 RST reject，
+      //   活端口 fetch 立即 resolve 成 opaque response，都不会触发 ERR_ABORTED。
       function probePorts(onFound, onAllDone) {
         var done = false;
         var finished = 0;
-        var TIMEOUT_MS = 1800;
+        var TIMEOUT_MS = 2000;
         CANDIDATE_PORTS.forEach(function (port) {
           var finishedThis = false;
           function finishOne(status) {
@@ -300,21 +304,16 @@
             if (finished === CANDIDATE_PORTS.length && !done && onAllDone) onAllDone();
           }
           try {
-            var ctrl = null;
-            if (typeof AbortController !== 'undefined') {
-              ctrl = new AbortController();
-              setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
-            } else {
-              setTimeout(function () { finishOne('timeout'); }, TIMEOUT_MS);
-            }
-            var url = 'http://localhost:' + port + '/favicon.ico?t=' + Date.now() + '&p=' + port;
+            // 安全网超时，但不 abort fetch（避免 ERR_ABORTED 红字）
+            setTimeout(function () { finishOne('timeout'); }, TIMEOUT_MS);
+            var url = 'http://localhost:' + port + '/@vite/client';
             fetch(url, {
               method: 'GET',
               mode: 'no-cors',
               cache: 'no-store',
               credentials: 'omit',
               redirect: 'follow',
-              signal: ctrl ? ctrl.signal : undefined,
+              // 去掉 signal！不 abort，就不会有 ERR_ABORTED 红错
             }).then(function () { finishOne('ok'); }).catch(function () { finishOne('dead'); });
           } catch (e) {
             finishOne('dead');
